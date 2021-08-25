@@ -29,8 +29,10 @@ class helper_plugin_structpublish_permissions extends DokuWiki_Plugin
         return $this->sqlite;
     }
 
-    public function getActionLinks()
+    public function getActionLinks($revision)
     {
+        if ($revision->getStatus() === Revision::STATUS_PUBLISHED) return [];
+
         global $ID;
         $links = [ self::ACTION_PUBLISH => wl($ID, ['structpublish' => self::ACTION_PUBLISH])];
         return $links;
@@ -59,7 +61,12 @@ class helper_plugin_structpublish_permissions extends DokuWiki_Plugin
     {
         global $ID;
 
-        // TODO implement checks
-        return true;
+        // TODO implement real checks
+        $sql = 'SELECT tbl FROM schema_assignments WHERE pid = ? AND assigned = 1';
+        $res = $this->sqlite->query($sql, $ID);
+        if ($res && $this->sqlite->res2count($res)) {
+            return true;
+        }
+        return false;
     }
 }

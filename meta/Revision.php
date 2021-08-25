@@ -9,36 +9,39 @@ class Revision
     const STATUS_PUBLISHED = 'published';
 
     protected $sqlite;
+    protected $schemas;
     protected $id;
     protected $rev;
     protected $status;
-    protected $version;
+    protected $version = 0;
     protected $user;
 
     /**
      * @param $sqlite
-     * @param $id
-     * @param null $rev
+     * @param string $id
+     * @param int $rev
      */
-    public function __construct($sqlite, $id, $rev = null)
+    public function __construct($sqlite, $id, $rev)
     {
         $this->sqlite = $sqlite;
         $this->id = $id;
         $this->rev = $rev;
 
-        // FIXME check revision too
-        $sql = 'SELECT * FROM structpublish_revisions WHERE id = ? ORDER BY rev LIMIT 1';
-        $res = $sqlite->query($sql, $id);
+        $sql = 'SELECT * FROM structpublish_revisions WHERE id = ? AND rev = ?';
+        $res = $sqlite->query($sql, $id, $rev);
         $vals = $sqlite->res2row($res);
-        $this->rev = $vals['rev'] ?? null;
-        $this->status = $vals['status'] ?? null;
-        $this->version = $vals['version'] ?? 0;
-        $this->user = $vals['user'] ?? null;
+
+        if (!empty($vals)) {
+            $this->status = $vals['status'];
+            $this->version = $vals['version'];
+            $this->user = $vals['user'];
+        }
     }
 
     public function save()
     {
-        $sql = 'INSERT INTO structpublish_revisions (id, rev, status, version, user) VALUES (?,?,?,?,?)';
+        // TODO reset publish status of older revisions
+        $sql = 'REPLACE INTO structpublish_revisions (id, rev, status, version, user) VALUES (?,?,?,?,?)';
         $res = $this->sqlite->query(
             $sql,
             $this->id,
@@ -47,10 +50,27 @@ class Revision
             $this->version,
             $this->user
         );
+
+        if ($this->status === self::STATUS_PUBLISHED) {
+            $this->updateCoreData();
+        }
     }
 
     /**
-     * @return mixed
+     * Returns the latest version for a given id, or 0
+     *
+     * @return int
+     */
+    public function getLatestVersion()
+    {
+        $sql = 'SELECT MAX(version) AS latest FROM structpublish_revisions WHERE id = ?';
+        $res = $this->sqlite->query($sql, $this->id);
+        $res = $this->sqlite->res2arr($res);
+        return $res['latest'] ?? 0;
+    }
+
+    /**
+     * @return string
      */
     public function getId()
     {
@@ -58,7 +78,7 @@ class Revision
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getVersion()
     {
@@ -66,7 +86,7 @@ class Revision
     }
 
     /**
-     * @param mixed $version
+     * @param int $version
      */
     public function setVersion($version): void
     {
@@ -74,7 +94,7 @@ class Revision
     }
 
     /**
-     * @return mixed|null
+     * @return int
      */
     public function getRev()
     {
@@ -82,7 +102,7 @@ class Revision
     }
 
     /**
-     * @param mixed|null $rev
+     * @param int $rev
      */
     public function setRev($rev): void
     {
@@ -90,7 +110,7 @@ class Revision
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getStatus()
     {
@@ -98,7 +118,7 @@ class Revision
     }
 
     /**
-     * @param mixed $status
+     * @param string $status
      */
     public function setStatus($status): void
     {
@@ -106,7 +126,7 @@ class Revision
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getUser()
     {
@@ -114,10 +134,20 @@ class Revision
     }
 
     /**
-     * @param mixed $user
+     * @param string $user
      */
     public function setUser($user): void
     {
         $this->user = $user;
+    }
+
+    /**
+     * Update publish status in the core table
+     */
+    protected function updateCoreData()
+    {
+        // FIXME we don't know anything about schemas yet!
+//        $sql = 'UPDATE data_schema SET published = NULL WHERE id = ?';
+//        $this->sqlite->query($sql, $this->id);
     }
 }

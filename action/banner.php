@@ -27,15 +27,19 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     public function renderBanner(Doku_Event $event)
     {
         global $ID;
+        global $INFO;
         $data = $event->data;
         if (!$data['hasdata'] || $data['format'] !== 'xhtml') return true;
+
+        /** @var Doku_Renderer_xhtml $renderer */
+        $renderer = $data['renderer'];
+        $renderer->nocache();
 
         $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
         if (!$this->permissionsHelper->isPublishable()) return true;
 
-        $revision = new Revision($this->permissionsHelper->getDb(), $ID);
+        $revision = new Revision($this->permissionsHelper->getDb(), $ID, $INFO['currentrev']);
 
-        $renderer = $data['renderer'];
         $html = $this->getBannerHtml($revision);
         $renderer->doc .= $html;
 
@@ -54,12 +58,15 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $html = '';
 
         if ($this->permissionsHelper->isPublisher($ID, $user)) {
+
+            $actionLinks = $this->linksToHtml($this->permissionsHelper->getActionLinks($revision));
+
             $html = sprintf(
                 $this->getBannerTemplate(),
                 $revision->getStatus(),
                 $revision->getVersion(),
                 $revision->getStatus(),
-                $this->linksToHtml($this->permissionsHelper->getActionLinks())
+                $actionLinks
             );
         }
 

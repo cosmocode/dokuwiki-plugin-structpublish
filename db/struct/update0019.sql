@@ -3,5 +3,6 @@ CREATE TABLE structpublish_revisions (
      user TEXT NOT NULL,
      rev INT NOT NULL,
      status TEXT DEFAULT '',
-     version INT DEFAULT 0
+     version INT DEFAULT 0,
+     PRIMARY KEY (id, rev)
 );
