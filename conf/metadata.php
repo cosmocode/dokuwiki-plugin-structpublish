@@ -5,6 +5,4 @@
  * @author Anna Dabrowska <dokuwiki@cosmocode.de>
  */
 
-
-//$meta['fixme'] = array('string');
-
+$meta['fixme'] = array('string');

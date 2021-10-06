@@ -23,6 +23,8 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
 
         // FIXME evaluate changeType
         $id = $event->data['id'];
+
+        if (!$permissionsHelper->isPublishable()) return;
         $revision = new Revision($permissionsHelper->getDb(), $id, $event->data['newRevision']);
         $revision->setStatus(Revision::STATUS_DRAFT);
         try {

@@ -27,7 +27,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         // check whether we are already up-to-date
         list($dbVersionStruct, $dbVersionStructpublish) = $this->getDbVersions($sqlite);
-        if (isset($dbVersionStructpublish) && $dbVersionStructpublish === $dbVersionStruct) {
+        if (isset($dbVersionStructpublish) && (string)$dbVersionStructpublish == (string)$dbVersionStruct) {
             return $ok;
         }
 
@@ -90,7 +90,6 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * Database setup, required struct db version is 19
      *
      * @param helper_plugin_sqlite $sqlite
-     * @param array $schema
      * @return bool
      */
     protected function migration19($sqlite)

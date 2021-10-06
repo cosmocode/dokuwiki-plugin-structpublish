@@ -9,7 +9,7 @@
 // $lang['menu'] = 'Your menu entry';
 
 // custom language strings for the plugin
- $lang['version'] = 'version';
+ $lang['version'] = 'latest version';
  $lang['status'] = 'status';
  $lang['actions'] = 'actions';
  $lang['status_draft'] = 'draft';

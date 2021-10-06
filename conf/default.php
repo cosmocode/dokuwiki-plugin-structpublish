@@ -5,5 +5,4 @@
  * @author Anna Dabrowska <dokuwiki@cosmocode.de>
  */
 
-//$conf['fixme']    = 'FIXME';
-
+$conf['fixme']    = 'FIXME';

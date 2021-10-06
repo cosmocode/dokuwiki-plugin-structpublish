@@ -2,19 +2,28 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
+use dokuwiki\plugin\struct\meta\AccessTable;
+use dokuwiki\plugin\struct\meta\AccessTableSerial;
+use dokuwiki\plugin\struct\meta\ConfigParser;
+use dokuwiki\plugin\struct\meta\Schema;
+use dokuwiki\plugin\struct\meta\SearchConfig;
+use dokuwiki\plugin\struct\meta\Value;
+
 class Revision
 {
     const STATUS_DRAFT = 'draft';
-    const STATUS_APPROVED = 'approved';
+    const STATUS_REVIEWED = 'reviewed';
     const STATUS_PUBLISHED = 'published';
 
+    /** @var \helper_plugin_sqlite */
     protected $sqlite;
     protected $schemas;
     protected $id;
     protected $rev;
     protected $status;
-    protected $version = 0;
+    protected $version;
     protected $user;
+    protected $date;
 
     /**
      * @param $sqlite
@@ -27,54 +36,34 @@ class Revision
         $this->id = $id;
         $this->rev = $rev;
 
-        $sql = 'SELECT * FROM structpublish_revisions WHERE id = ? AND rev = ?';
-        $res = $sqlite->query($sql, $id, $rev);
-        $vals = $sqlite->res2row($res);
+        $schema = new Schema('structpublish');
+        $statusCol = $schema->findColumn('status');
+        $versionCol = $schema->findColumn('version');
+        $userCol = $schema->findColumn('user');
+        $dateCol = $schema->findColumn('date');
 
-        if (!empty($vals)) {
-            $this->status = $vals['status'];
-            $this->version = $vals['version'];
-            $this->user = $vals['user'];
+        /** @var Value[] $values */
+        $values = $this->getCoreData($id);
+
+        if (!empty($values)) {
+            $this->status = $values[$statusCol->getColref() - 1]->getRawValue();
+            $this->version = $values[$versionCol->getColref() - 1]->getRawValue();
+            $this->user = $values[$userCol->getColref() - 1]->getRawValue();
+            $this->date = $values[$dateCol->getColref() - 1]->getRawValue();
         }
     }
 
     public function save()
     {
-        // TODO reset publish status of older revisions
-        $sql = 'REPLACE INTO structpublish_revisions (id, rev, status, version, user) VALUES (?,?,?,?,?)';
-        $res = $this->sqlite->query(
-            $sql,
-            $this->id,
-            $this->rev,
-            $this->status,
-            $this->version,
-            $this->user
-        );
-
-        if ($this->status === self::STATUS_PUBLISHED) {
-            $this->updateCoreData();
+        // drafts reference the latest version
+        if ($this->status === self::STATUS_DRAFT) {
+            //FIXME no rev yet
+            $this->setVersion($this->getVersion());
         }
-    }
 
-    /**
-     * Returns the latest version for a given id, or 0
-     *
-     * @return int
-     */
-    public function getLatestVersion()
-    {
-        $sql = 'SELECT MAX(version) AS latest FROM structpublish_revisions WHERE id = ?';
-        $res = $this->sqlite->query($sql, $this->id);
-        $res = $this->sqlite->res2arr($res);
-        return $res['latest'] ?? 0;
-    }
+        // TODO reset publish status of older revisions
 
-    /**
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->id;
+            $this->updateCoreData($this->id);
     }
 
     /**
@@ -114,7 +103,7 @@ class Revision
      */
     public function getStatus()
     {
-        return $this->status ?? self::STATUS_DRAFT;
+        return $this->status;
     }
 
     /**
@@ -141,13 +130,46 @@ class Revision
         $this->user = $user;
     }
 
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate($time)
+    {
+        $this->date = date('Y-m-d', $time);
+    }
+
     /**
      * Update publish status in the core table
      */
-    protected function updateCoreData()
+    protected function updateCoreData($pid, $rid = 0)
     {
-        // FIXME we don't know anything about schemas yet!
-//        $sql = 'UPDATE data_schema SET published = NULL WHERE id = ?';
-//        $this->sqlite->query($sql, $this->id);
+        $data = [
+            'status' => $this->status,
+            'user' => $this->user,
+            'date' => $this->date,
+            'revision' => $this->rev,
+            'version' => $this->version,
+        ];
+        $access = AccessTable::getSerialAccess('structpublish', $pid, $rid);
+        $access->saveData($data);
+    }
+
+    public function getCoreData($id)
+    {
+        $lines = [
+            'schema: structpublish',
+            'cols: *',
+            'filter: %pageid% = $ID$'
+        ];
+        $parser = new ConfigParser($lines);
+        $config = $parser->getConfig();
+        $search = new SearchConfig($config);
+        $data = $search->execute();
+        if (!empty($data)) {
+            return $data[array_key_last($data)];
+        }
+        return [];
     }
 }

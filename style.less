@@ -1,10 +1,20 @@
 .plugin-structpublish-banner {
+
+    border: 1px solid @ini_border;
+
+    &.banner-header {
+        background-color: @ini_border;
+        text-align: center;
+    }
+
     &.banner-draft {
         background-color: red;
     }
+
     &.banner-approved {
         background-color: yellow;
     }
+
     &.banner-published {
         background-color: green;
     }
