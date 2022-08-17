@@ -11,7 +11,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 
 class helper_plugin_structpublish_permissions extends DokuWiki_Plugin
 {
-    const ACTION_REVIEW = 'review';
+    const ACTION_APPROVE = 'approve';
     const ACTION_PUBLISH = 'publish';
 
     /** @var helper_plugin_sqlite|null  */
@@ -73,7 +73,7 @@ class helper_plugin_structpublish_permissions extends DokuWiki_Plugin
      */
     public function getLatestPublished($id)
     {
-        $sql = 'SELECT MAX(rev) FROM structpublish_revisions WHERE id = ? AND status = ?';
+        $sql = 'SELECT MAX(rev) FROM data_structpublish WHERE pid = ? AND status = ?';
         $res = $this->sqlite->query($sql, $id, Revision::STATUS_PUBLISHED);
         if (!$res) return 0;
 

@@ -54,12 +54,13 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 
             $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
             $version = $revision->getVersion() ?: '';
+            $actionForm = $status !== Revision::STATUS_PUBLISHED ? $this->formHtml() : '';
             $html = sprintf(
                 $this->getBannerTemplate(),
                 $status,
                 $version,
                 $status,
-                $this->formHtml()
+                $actionForm
             );
         }
 
@@ -69,8 +70,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     protected function formHtml()
     {
         $form = new dokuwiki\Form\Form();
-        $form->addButton('structpublish[review]', 'REVIEWED');
-        $form->addButton('structpublish[publish]', 'PUBLISH');
+        $form->addButton('structpublish[approve]', 'APPROVE')->attr('type', 'submit');
+        $form->addButton('structpublish[publish]', 'PUBLISH')->attr('type', 'submit');
 
         return $form->toHTML();
     }
@@ -78,10 +79,9 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     protected function getBannerTemplate()
     {
         $template = '<div class="plugin-structpublish-banner banner-%s">';
-        $template .= '<div class="plugin-structpublish-banner banner-header">structpublish</div>';
         $template .= '<div class="plugin-structpublish-version">' . $this->getLang('version') . ': %s</div>';
         $template .= '<div class="plugin-structpublish-status">' . $this->getLang('status') . ': %s</div>';
-        $template .= '<div class="plugin-structpublish-actions">' . $this->getLang('actions') . ': %s</div>';
+        $template .= '<div class="plugin-structpublish-actions">%s</div>';
         $template .= '</div>';
 
         return $template;

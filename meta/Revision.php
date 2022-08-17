@@ -2,8 +2,6 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
-use dokuwiki\plugin\struct\meta\AccessTable;
-use dokuwiki\plugin\struct\meta\AccessTableSerial;
 use dokuwiki\plugin\struct\meta\ConfigParser;
 use dokuwiki\plugin\struct\meta\Schema;
 use dokuwiki\plugin\struct\meta\SearchConfig;
@@ -12,7 +10,7 @@ use dokuwiki\plugin\struct\meta\Value;
 class Revision
 {
     const STATUS_DRAFT = 'draft';
-    const STATUS_REVIEWED = 'reviewed';
+    const STATUS_APPROVED = 'approved';
     const STATUS_PUBLISHED = 'published';
 
     /** @var \helper_plugin_sqlite */
@@ -71,7 +69,7 @@ class Revision
      */
     public function getVersion()
     {
-        return $this->version;
+        return (int)$this->version;
     }
 
     /**
@@ -152,7 +150,8 @@ class Revision
             'revision' => $this->rev,
             'version' => $this->version,
         ];
-        $access = AccessTable::getSerialAccess('structpublish', $pid, $rid);
+        $schema = new Schema('structpublish', 0);
+        $access = new AccessTableStructpublish($schema, $pid, 0, $rid);
         $access->saveData($data);
     }
 
