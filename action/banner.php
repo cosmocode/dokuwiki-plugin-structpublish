@@ -32,8 +32,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         if ($event->data !== 'show') return;
 
         $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-        $this->dbHelper = plugin_load('helper', 'structpublish_permissions');
-        if (!$this->permissionsHelper->isPublishable()) return;
+        $this->dbHelper = plugin_load('helper', 'structpublish_db');
+        if (!$this->dbHelper->IS_PUBLISHER($ID)) return;
 
         $revision = new Revision($this->permissionsHelper->getDb(), $ID, $INFO['currentrev']);
 
@@ -50,7 +50,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $user = $_SERVER['REMOTE_USER'];
         $html = '';
 
-        if ($this->permissionsHelper->isPublisher($ID, $user)) {
+        if ($this->dbHelper->IS_PUBLISHER($ID, $user)) {
 
             $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
             $version = $revision->getVersion() ?: '';
