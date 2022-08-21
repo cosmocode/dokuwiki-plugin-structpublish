@@ -12,6 +12,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
      */
     public function register(Doku_Event_Handler $controller)
     {
+        $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handleApprove');
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handlePublish');
     }
 
@@ -21,7 +22,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
 
         global $INPUT;
         $in = $INPUT->arr('structpublish');
-        if (!$in || !$in[\helper_plugin_structpublish_permissions::ACTION_PUBLISH]) {
+        if (!$in || !isset($in[\helper_plugin_structpublish_permissions::ACTION_PUBLISH])) {
             return;
         }
 
@@ -37,6 +38,30 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         $revision->setVersion($revision->getVersion() + 1);
         $revision->setUser($_SERVER['REMOTE_USER']);
         $revision->setStatus(Revision::STATUS_PUBLISHED);
+        $revision->setDate(time());
+
+        $revision->save();
+    }
+
+    public function handleApprove(Doku_Event $event)
+    {
+        if ($event->data != 'show') return;
+
+        global $INPUT;
+        $in = $INPUT->arr('structpublish');
+        if (!$in || !isset($in[\helper_plugin_structpublish_permissions::ACTION_APPROVE])) {
+            return;
+        }
+
+        $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
+
+        global $ID;
+        global $INFO;
+        $sqlite = $this->permissionsHelper->getDb();
+        $revision = new Revision($sqlite, $ID, $INFO['currentrev']);
+        $revision->setVersion($revision->getVersion());
+        $revision->setUser($_SERVER['REMOTE_USER']);
+        $revision->setStatus(Revision::STATUS_APPROVED);
         $revision->setDate(time());
 
         $revision->save();

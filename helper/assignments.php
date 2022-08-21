@@ -9,57 +9,6 @@
 
 class helper_plugin_structpublish_assignments extends DokuWiki_Plugin
 {
-
-    /**
-     * @param $pattern
-     * @param $src
-     * @param $config
-     * @return array
-     */
-    public function generateRules($pattern = null, $src = null, $config = null)
-    {
-        $rules = [];
-        // ns pattern
-        $pattern = 'testpage';
-        $src = [
-            'page' => [
-                'status' => [
-                    'publish' => [
-                        'user' => ['@admin']
-                    ]
-                ]
-            ],
-            'test' => [
-                'status' => [
-                    'publish' => [
-                        'user' => ['@admin']
-                    ]
-                ]
-            ],
-            'testpage' => [
-                'status' => [
-                    'publish' => [
-                        'user' => ['@admin']
-                    ]
-                ]
-            ],
-            'testpage1' => [
-                'status' => [
-                    'publish' => [
-                        'user' => ['@admin']
-                    ]
-                ]
-            ],
-        ];
-
-        // Expected return pattern:
-
-        $rules = [
-
-        ];
-
-        return $rules;
-    }
     /**
      * Check if the given pattern matches the given page
      * @author Andreas Gohr

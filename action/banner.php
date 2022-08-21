@@ -63,7 +63,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
                 $version .= '</a>';
             }
 
-            $actionForm = $status !== Revision::STATUS_PUBLISHED ? $this->formHtml() : '';
+            $actionForm = $this->formHtml($status);
 
             $html = sprintf(
                 $this->getBannerTemplate(),
@@ -77,10 +77,15 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         return $html;
     }
 
-    protected function formHtml()
+    protected function formHtml($status)
     {
+        if ($status === Revision::STATUS_PUBLISHED) return '';
+
         $form = new dokuwiki\Form\Form();
-        $form->addButton('structpublish[approve]', 'APPROVE')->attr('type', 'submit');
+
+        if ($status !== Revision::STATUS_APPROVED) {
+            $form->addButton('structpublish[approve]', 'APPROVE')->attr('type', 'submit');
+        }
         $form->addButton('structpublish[publish]', 'PUBLISH')->attr('type', 'submit');
 
         return $form->toHTML();
