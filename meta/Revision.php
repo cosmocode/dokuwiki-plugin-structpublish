@@ -15,13 +15,24 @@ class Revision
 
     /** @var \helper_plugin_sqlite */
     protected $sqlite;
-    protected $schemas;
+
+    protected $schema;
+
+
     protected $id;
     protected $rev;
     protected $status;
     protected $version;
     protected $user;
     protected $date;
+    /**
+     * @var bool|\dokuwiki\plugin\struct\meta\Column
+     */
+    protected $statusCol;
+    protected $versionCol;
+    protected $userCol;
+    protected $dateCol;
+    protected $revisionCol;
 
     /**
      * @param $sqlite
@@ -34,20 +45,21 @@ class Revision
         $this->id = $id;
         $this->rev = $rev;
 
-        $schema = new Schema('structpublish');
-        $statusCol = $schema->findColumn('status');
-        $versionCol = $schema->findColumn('version');
-        $userCol = $schema->findColumn('user');
-        $dateCol = $schema->findColumn('date');
+        $this->schema = new Schema('structpublish');
+        $this->statusCol = $this->schema->findColumn('status');
+        $this->versionCol = $this->schema->findColumn('version');
+        $this->userCol = $this->schema->findColumn('user');
+        $this->dateCol = $this->schema->findColumn('date');
+        $this->revisionCol = $this->schema->findColumn('revision');
 
         /** @var Value[] $values */
-        $values = $this->getCoreData($id);
+        $values = $this->getCoreData();
 
         if (!empty($values)) {
-            $this->status = $values[$statusCol->getColref() - 1]->getRawValue();
-            $this->version = $values[$versionCol->getColref() - 1]->getRawValue();
-            $this->user = $values[$userCol->getColref() - 1]->getRawValue();
-            $this->date = $values[$dateCol->getColref() - 1]->getRawValue();
+            $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
+            $this->version = $values[$this->versionCol->getColref() - 1]->getRawValue();
+            $this->user = $values[$this->userCol->getColref() - 1]->getRawValue();
+            $this->date = $values[$this->dateCol->getColref() - 1]->getRawValue();
         }
     }
 
@@ -155,13 +167,18 @@ class Revision
         $access->saveData($data);
     }
 
-    public function getCoreData($id)
+    public function getCoreData($andFilter = '')
     {
         $lines = [
             'schema: structpublish',
             'cols: *',
             'filter: %pageid% = $ID$'
         ];
+
+        if ($andFilter) {
+            $lines[] = 'filter: ' . $andFilter;
+        }
+
         $parser = new ConfigParser($lines);
         $config = $parser->getConfig();
         $search = new SearchConfig($config);
@@ -170,5 +187,15 @@ class Revision
             return $data[array_key_last($data)];
         }
         return [];
+    }
+
+    public function getLatestPublished()
+    {
+        return $this->getCoreData('status=' . self::STATUS_PUBLISHED);
+    }
+
+    public function getLatestPublishedRev()
+    {
+        return $this->getLatestPublished()[$this->revisionCol->getColref() - 1]->getRawValue();
     }
 }

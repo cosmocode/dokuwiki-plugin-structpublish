@@ -9,14 +9,14 @@
  $lang['menu'] = 'Structured publish data';
 
 // banner
- $lang['version'] = 'latest published version';
- $lang['status'] = 'status';
- $lang['actions'] = 'actions';
- $lang['status_draft'] = 'draft';
- $lang['status_approved'] = 'approved';
- $lang['status_published'] = 'published';
- $lang['action_approve'] = 'approve';
- $lang['action_publish'] = 'publish';
+ $lang['version'] = 'View latest published version';
+ $lang['status'] = 'Publish status of the page you are currently viewing';
+ $lang['actions'] = 'Actions';
+ $lang['status_draft'] = 'Draft';
+ $lang['status_approved'] = 'Approved';
+ $lang['status_published'] = 'Published';
+ $lang['action_approve'] = 'Approve';
+ $lang['action_publish'] = 'Publish';
 
  // admin
  $lang['assign_pattern'] = 'Pattern';

@@ -53,13 +53,23 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         if ($this->dbHelper->IS_PUBLISHER($ID, $user)) {
 
             $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
-            $version = $revision->getVersion() ?: '';
+            $publisher = userlink($revision->getUser(), true);
+            $publishDate = $revision->getDate();
+
+            $version =  '';
+            if ($revision->getVersion()) {
+                $version = '<a href="'. wl($ID, ['rev' => $revision->getLatestPublishedRev()]) . ' ">';
+                $version .= $revision->getVersion() . " ($publishDate, $publisher)";
+                $version .= '</a>';
+            }
+
             $actionForm = $status !== Revision::STATUS_PUBLISHED ? $this->formHtml() : '';
+
             $html = sprintf(
                 $this->getBannerTemplate(),
                 $status,
-                $version,
                 $status,
+                $version,
                 $actionForm
             );
         }
@@ -79,8 +89,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     protected function getBannerTemplate()
     {
         $template = '<div class="plugin-structpublish-banner banner-%s">';
-        $template .= '<div class="plugin-structpublish-version">' . $this->getLang('version') . ': %s</div>';
         $template .= '<div class="plugin-structpublish-status">' . $this->getLang('status') . ': %s</div>';
+        $template .= '<div class="plugin-structpublish-version">' . $this->getLang('version') . ': %s</div>';
         $template .= '<div class="plugin-structpublish-actions">%s</div>';
         $template .= '</div>';
 
