@@ -35,7 +35,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
         if (!$this->dbHelper->IS_PUBLISHER($ID)) return;
 
-        $revision = new Revision($this->permissionsHelper->getDb(), $ID, $INFO['currentrev']);
+        $revision = new Revision($this->permissionsHelper->getDb(), $ID, $INFO['rev']);
 
         echo $this->getBannerHtml($revision);
     }

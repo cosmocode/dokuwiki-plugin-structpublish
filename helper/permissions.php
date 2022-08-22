@@ -35,20 +35,6 @@ class helper_plugin_structpublish_permissions extends DokuWiki_Plugin
     }
 
     /**
-     * Return true if the current user may see and approve drafts of the current page.
-     *
-     * @param string $id
-     * @return bool
-     */
-    public function isPublisher($id)
-    {
-        $user = $_SERVER['REMOTE_USER'];
-
-        // TODO implement checks
-        return true;
-    }
-
-    /**
      * Returns true if the current page is included in publishing workflows
      *
      * @return bool
@@ -63,20 +49,5 @@ class helper_plugin_structpublish_permissions extends DokuWiki_Plugin
             return true;
         }
         return false;
-    }
-
-    /**
-     * Get the latest published revision
-     *
-     * @param string $id
-     * @return int
-     */
-    public function getLatestPublished($id)
-    {
-        $sql = 'SELECT MAX(rev) FROM data_structpublish WHERE pid = ? AND status = ?';
-        $res = $this->sqlite->query($sql, $id, Revision::STATUS_PUBLISHED);
-        if (!$res) return 0;
-
-        return $this->sqlite->res2single($res);
     }
 }

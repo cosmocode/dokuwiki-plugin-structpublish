@@ -53,7 +53,7 @@ class Revision
         $this->revisionCol = $this->schema->findColumn('revision');
 
         /** @var Value[] $values */
-        $values = $this->getCoreData();
+        $values = $this->getCoreData('revision=' . $this->rev);
 
         if (!empty($values)) {
             $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
@@ -184,6 +184,7 @@ class Revision
         $search = new SearchConfig($config);
         $data = $search->execute();
         if (!empty($data)) {
+            // FIXME
             return $data[array_key_last($data)];
         }
         return [];
