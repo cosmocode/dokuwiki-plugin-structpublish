@@ -8,8 +8,6 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 {
-    /** @var \helper_plugin_structpublish_permissions */
-    protected $permissionsHelper;
     /** @var \helper_plugin_structpublish_db */
     protected $dbHelper;
 
@@ -32,10 +30,10 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 
         if ($event->data !== 'show') return;
 
-        $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-        if (!$this->permissionsHelper->isPublishable()) return;
-
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
+
+        if (!$this->dbHelper->isPublishable()) return;
+
         $revision = new Revision($this->dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
 
         echo $this->getBannerHtml($revision);

@@ -4,9 +4,6 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 
 class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
 {
-    /** @var \helper_plugin_structpublish_permissions */
-    protected $permissionsHelper;
-
     /**
      * @inheritDoc
      */
@@ -23,11 +20,10 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         global $REV;
         global $INFO;
 
-        $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
         /** @var helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
-        if (!$this->permissionsHelper->isPublishable()) return;
+        if (!$dbHelper->isPublishable()) return;
 
         $currentRevision = new Revision($dbHelper->getDB(), $ID, $INFO['currentrev']);
         if (

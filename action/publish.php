@@ -4,8 +4,8 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 
 class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
 {
-    /** @var \helper_plugin_structpublish_permissions */
-    protected $permissionsHelper;
+    /** @var \helper_plugin_structpublish_db */
+    protected $dbHelper;
 
     /**
      * @inheritDoc
@@ -20,19 +20,19 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     {
         if ($event->data != 'show') return;
 
+        $this->dbHelper = plugin_load('helper', 'structpublish_db');
+
         global $INPUT;
         $in = $INPUT->arr('structpublish');
-        if (!$in || !isset($in[\helper_plugin_structpublish_permissions::ACTION_PUBLISH])) {
+        if (!$in || !isset($in[$this->dbHelper::ACTION_PUBLISH])) {
             return;
         }
 
         // FIXME prevent bumping published version
 
-        $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-
         global $ID;
         global $INFO;
-        $sqlite = $this->permissionsHelper->getDb();
+        $sqlite = $this->dbHelper->getDB();
         $revision = new Revision($sqlite, $ID, $INFO['currentrev']);
         // TODO do not autoincrement version, make it a string
         $revision->setVersion($revision->getVersion() + 1);
@@ -47,17 +47,17 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     {
         if ($event->data != 'show') return;
 
+        $this->dbHelper = plugin_load('helper', 'structpublish_db');
+
         global $INPUT;
         $in = $INPUT->arr('structpublish');
-        if (!$in || !isset($in[\helper_plugin_structpublish_permissions::ACTION_APPROVE])) {
+        if (!$in || !isset($in[$this->dbHelper::ACTION_APPROVE])) {
             return;
         }
 
-        $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-
         global $ID;
         global $INFO;
-        $sqlite = $this->permissionsHelper->getDb();
+        $sqlite = $this->dbHelper->getDB();
         $revision = new Revision($sqlite, $ID, $INFO['currentrev']);
         $revision->setVersion($revision->getVersion());
         $revision->setUser($_SERVER['REMOTE_USER']);

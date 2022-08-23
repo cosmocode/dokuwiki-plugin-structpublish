@@ -4,6 +4,9 @@ use dokuwiki\plugin\structpublish\meta\Assignments;
 
 class helper_plugin_structpublish_db extends helper_plugin_struct_db
 {
+    const ACTION_APPROVE = 'approve';
+    const ACTION_PUBLISH = 'publish';
+
     /**
      * Get list of all pages known to the plugin
      * @return array
@@ -18,6 +21,23 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
         $list = $this->sqlite->res2arr($res);
         $this->sqlite->res_close($res);
         return $list;
+    }
+
+    /**
+     * Returns true if the current page is included in publishing workflows
+     *
+     * @return bool
+     */
+    public function isPublishable()
+    {
+        global $ID;
+
+        $sql = 'SELECT * FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
+        $res = $this->sqlite->query($sql, $ID);
+        if ($res && $this->sqlite->res2count($res)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -40,7 +60,7 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
         $grps = $args[2] ?? ($USERINFO['grps'] ?? []);
 
         return $this->userHasRole(
-            [helper_plugin_structpublish_permissions::ACTION_PUBLISH, helper_plugin_structpublish_permissions::ACTION_APPROVE],
+            [self::ACTION_PUBLISH, self::ACTION_APPROVE],
             $userId,
             $grps,
             $pid
@@ -54,7 +74,7 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
 
         foreach ($roles as $role) {
             if (isset($rules[$role])) {
-                $users = $rules[helper_plugin_structpublish_permissions::ACTION_PUBLISH];
+                $users = $rules[self::ACTION_PUBLISH];
                 if (auth_isMember(implode(',', $users), $userId, $grps)) {
                     return true;
                 }

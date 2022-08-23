@@ -20,7 +20,7 @@
 
  // admin
  $lang['assign_pattern'] = 'Pattern';
- $lang['assign_user'] = 'Users and groups';
+ $lang['assign_user'] = 'User or @group';
  $lang['assign_status'] = 'Status';
  $lang['assign_add'] = 'Add assignment';
  $lang['assign_del'] = 'Remove assignment';
