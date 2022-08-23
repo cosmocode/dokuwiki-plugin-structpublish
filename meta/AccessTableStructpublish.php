@@ -2,20 +2,32 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
+use dokuwiki\plugin\struct\meta\AccessTable;
 use dokuwiki\plugin\struct\meta\AccessTableSerial;
 
 /**
  * Class AccessTableStructpublish
  *
- * Load and save serial data
+ * Load and save publish data
  *
  * @package dokuwiki\plugin\struct\meta
  */
 class AccessTableStructpublish extends AccessTableSerial
 {
+    protected $published = 0;
+
     public function __construct($table, $pid, $ts = 0, $rid = 0)
     {
         parent::__construct($table, $pid, $ts, $rid);
+    }
+
+    /**
+     * @param int $published
+     * @return void
+     */
+    public function setPublished($published)
+    {
+        $this->published = $published;
     }
 
     /**
@@ -38,6 +50,22 @@ class AccessTableStructpublish extends AccessTableSerial
     protected function getMultiSql()
     {
         return '';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getSingleNoninputCols()
+    {
+        return ['pid', 'rev', 'latest', 'published'];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getSingleNoninputValues()
+    {
+        return [$this->pid, AccessTable::DEFAULT_REV, AccessTable::DEFAULT_LATEST, $this->published];
     }
 
     /**

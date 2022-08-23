@@ -18,9 +18,9 @@ class Revision
 
     protected $schema;
 
-
     protected $id;
     protected $rev;
+    protected $published;
     protected $status;
     protected $version;
     protected $user;
@@ -44,6 +44,7 @@ class Revision
         $this->sqlite = $sqlite;
         $this->id = $id;
         $this->rev = $rev;
+        $this->published = 0;
 
         $this->schema = new Schema('structpublish');
         $this->statusCol = $this->schema->findColumn('status');
@@ -71,9 +72,13 @@ class Revision
             $this->setVersion($this->getVersion());
         }
 
+        if ($this->status === self::STATUS_PUBLISHED) {
+            $this->published = 1;
+        }
+
+        $this->updateCoreData($this->id);
         // TODO reset publish status of older revisions
 
-            $this->updateCoreData($this->id);
     }
 
     /**
@@ -164,6 +169,7 @@ class Revision
         ];
         $schema = new Schema('structpublish', 0);
         $access = new AccessTableStructpublish($schema, $pid, 0, $rid);
+        $access->setPublished($this->published);
         $access->saveData($data);
     }
 
