@@ -19,7 +19,6 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
     {
         if ($event->data != 'show') return;
 
-
         global $ID;
         global $REV;
         global $INFO;
@@ -35,19 +34,16 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
             $currentRevision->getStatus() !== Revision::STATUS_PUBLISHED
             && !$dbHelper->IS_PUBLISHER($ID)
         ) {
-            /** @var Revision $latestPublished */
-            $latestPublished = $currentRevision->getLatestPublishedRev();
-            if (!$latestPublished) {
+            $latestPublishedRev = $currentRevision->getLatestPublished('revision');
+            if (!$latestPublishedRev) {
                 $event->data = 'denied';
-
                 $event->preventDefault();
                 $event->stopPropagation();
-
                 print p_locale_xhtml('denied');
             }
 
-            $REV = $latestPublished;
-            $INFO['rev'] = $latestPublished;
+            $REV = $latestPublishedRev;
+            $INFO['rev'] = $latestPublishedRev;
         }
     }
 }

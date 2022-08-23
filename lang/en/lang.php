@@ -9,7 +9,7 @@
  $lang['menu'] = 'Structured publish data';
 
 // banner
- $lang['version'] = 'View latest published version';
+ $lang['version'] = 'Version';
  $lang['status'] = 'Publish status of the page you are currently viewing';
  $lang['actions'] = 'Actions';
  $lang['status_draft'] = 'Draft';

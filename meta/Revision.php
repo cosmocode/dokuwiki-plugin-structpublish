@@ -190,13 +190,23 @@ class Revision
         return [];
     }
 
-    public function getLatestPublished()
+    /**
+     * Get a property of the latest published revision associated with the current one
+     *
+     * @param string $key
+     * @return string
+     */
+    public function getLatestPublished($key)
     {
-        return $this->getCoreData('status=' . self::STATUS_PUBLISHED);
-    }
+        $latestPublished = $this->getCoreData('status=' . self::STATUS_PUBLISHED);
+        $data = [
+            'status' => $latestPublished[$this->statusCol->getColref() - 1]->getRawValue(),
+            'user' => $latestPublished[$this->userCol->getColref() - 1]->getRawValue(),
+            'date' => $latestPublished[$this->dateCol->getColref() - 1]->getRawValue(),
+            'revision' => $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue(),
+            'version' => $latestPublished[$this->versionCol->getColref() - 1]->getRawValue(),
+        ];
 
-    public function getLatestPublishedRev()
-    {
-        return $this->getLatestPublished()[$this->revisionCol->getColref() - 1]->getRawValue();
+        return $data[$key] ?? '';
     }
 }

@@ -25,12 +25,16 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
         // FIXME evaluate changeType
         $id = $event->data['id'];
 
+        // before checking for isPublishable() we have to update assignments
         $assignments = Assignments::getInstance();
         $assignments->updatePageAssignments($id);
 
         if (!$permissionsHelper->isPublishable()) return;
+
         $revision = new Revision($permissionsHelper->getDb(), $id, $event->data['newRevision']);
         $revision->setStatus(Revision::STATUS_DRAFT);
+        $revision->setVersion($revision->getLatestPublished('version'));
+
         try {
             $revision->save();
         } catch (StructException $e) {

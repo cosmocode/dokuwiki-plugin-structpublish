@@ -27,15 +27,16 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     public function renderBanner(Doku_Event $event)
     {
         global $ID;
+        global $INFO;
         global $REV;
 
         if ($event->data !== 'show') return;
 
         $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-        $this->dbHelper = plugin_load('helper', 'structpublish_db');
         if (!$this->permissionsHelper->isPublishable()) return;
 
-        $revision = new Revision($this->dbHelper->getDB(), $ID, $REV);
+        $this->dbHelper = plugin_load('helper', 'structpublish_db');
+        $revision = new Revision($this->dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
 
         echo $this->getBannerHtml($revision);
     }
@@ -49,14 +50,24 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         global $ID;
 
         $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
-        $publisher = userlink($revision->getUser(), true);
-        $publishDate = $revision->getDate();
+        if ($status === Revision::STATUS_PUBLISHED) {
+            $publisher = userlink($revision->getUser(), true);
+            $publishDate = $revision->getDate();
+        } else {
+            $publisher = userlink($revision->getLatestPublished('user'), true);
+            $publishDate = $revision->getLatestPublished('date');
+        }
 
         $version =  '';
         if ($revision->getVersion()) {
-            $version = '<a href="'. wl($ID, ['rev' => $revision->getLatestPublishedRev()]) . ' ">';
-            $version .= $revision->getVersion() . " ($publishDate, $publisher)";
-            $version .= '</a>';
+            $version = $revision->getVersion() . " ($publishDate, $publisher)";
+
+            if ($status !== Revision::STATUS_PUBLISHED) {
+                $version = sprintf(
+                    '<a href="'. wl($ID, ['rev' => $revision->getLatestPublished('revision')]) . ' ">%s</a>',
+                    $version
+                );
+            }
         }
 
         $actionForm = $this->formHtml($status);
