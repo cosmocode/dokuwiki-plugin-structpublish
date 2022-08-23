@@ -181,7 +181,7 @@ class Revision
 
         $parser = new ConfigParser($lines);
         $config = $parser->getConfig();
-        $search = new SearchConfig($config);
+        $search = new SearchConfig($config, $this->sqlite);
         $data = $search->execute();
         if (!empty($data)) {
             // FIXME

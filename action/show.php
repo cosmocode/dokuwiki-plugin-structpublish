@@ -25,10 +25,12 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         global $INFO;
 
         $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-        $sqlite = $this->permissionsHelper->getDb();
+        /** @var helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
-        $currentRevision = new Revision($sqlite, $ID, $INFO['currentrev']);
+        if (!$this->permissionsHelper->isPublishable()) return;
+
+        $currentRevision = new Revision($dbHelper->getDB(), $ID, $INFO['currentrev']);
         if (
             $currentRevision->getStatus() !== Revision::STATUS_PUBLISHED
             && !$dbHelper->IS_PUBLISHER($ID)

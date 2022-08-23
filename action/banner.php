@@ -27,15 +27,15 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     public function renderBanner(Doku_Event $event)
     {
         global $ID;
-        global $INFO;
+        global $REV;
 
         if ($event->data !== 'show') return;
 
         $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
-        if (!$this->dbHelper->IS_PUBLISHER($ID)) return;
+        if (!$this->permissionsHelper->isPublishable()) return;
 
-        $revision = new Revision($this->permissionsHelper->getDb(), $ID, $INFO['rev']);
+        $revision = new Revision($this->dbHelper->getDB(), $ID, $REV);
 
         echo $this->getBannerHtml($revision);
     }
@@ -47,32 +47,27 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     protected function getBannerHtml($revision)
     {
         global $ID;
-        $user = $_SERVER['REMOTE_USER'];
-        $html = '';
 
-        if ($this->dbHelper->IS_PUBLISHER($ID, $user)) {
+        $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
+        $publisher = userlink($revision->getUser(), true);
+        $publishDate = $revision->getDate();
 
-            $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
-            $publisher = userlink($revision->getUser(), true);
-            $publishDate = $revision->getDate();
-
-            $version =  '';
-            if ($revision->getVersion()) {
-                $version = '<a href="'. wl($ID, ['rev' => $revision->getLatestPublishedRev()]) . ' ">';
-                $version .= $revision->getVersion() . " ($publishDate, $publisher)";
-                $version .= '</a>';
-            }
-
-            $actionForm = $this->formHtml($status);
-
-            $html = sprintf(
-                $this->getBannerTemplate(),
-                $status,
-                $status,
-                $version,
-                $actionForm
-            );
+        $version =  '';
+        if ($revision->getVersion()) {
+            $version = '<a href="'. wl($ID, ['rev' => $revision->getLatestPublishedRev()]) . ' ">';
+            $version .= $revision->getVersion() . " ($publishDate, $publisher)";
+            $version .= '</a>';
         }
+
+        $actionForm = $this->formHtml($status);
+
+        $html = sprintf(
+            $this->getBannerTemplate(),
+            $status,
+            $status,
+            $version,
+            $actionForm
+        );
 
         return $html;
     }
