@@ -205,6 +205,8 @@ class Revision
     public function getLatestPublished($key)
     {
         $latestPublished = $this->getCoreData('status=' . self::STATUS_PUBLISHED);
+        if (!$latestPublished) return '';
+
         $data = [
             'status' => $latestPublished[$this->statusCol->getColref() - 1]->getRawValue(),
             'user' => $latestPublished[$this->userCol->getColref() - 1]->getRawValue(),
