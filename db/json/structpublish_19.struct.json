@@ -1,0 +1,184 @@
+{
+    "structversion": "2022-07-04",
+    "schema": "structpublish",
+    "id": 138,
+    "user": "admin",
+    "config": {
+        "allowed editors": "NONE",
+        "noedit": true,
+        "label": {
+            "de": "",
+            "en": "",
+            "fr": ""
+        }
+    },
+    "columns": [
+        {
+            "colref": 1,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 10,
+            "label": "status",
+            "class": "Dropdown",
+            "config": {
+                "visibility": {
+                    "inpage": false,
+                    "ineditor": false
+                },
+                "values": "draft,reviewed,published",
+                "label": {
+                    "de": "",
+                    "en": "",
+                    "fr": ""
+                },
+                "hint": {
+                    "de": "",
+                    "en": "",
+                    "fr": ""
+                }
+            }
+        },
+        {
+            "colref": 2,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 20,
+            "label": "user",
+            "class": "User",
+            "config": {
+                "visibility": {
+                    "inpage": false,
+                    "ineditor": false
+                },
+                "existingonly": false,
+                "autocomplete": {
+                    "fullname": true,
+                    "mininput": 2,
+                    "maxresult": 5
+                },
+                "label": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                },
+                "hint": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                }
+            }
+        },
+        {
+            "colref": 3,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 30,
+            "label": "date",
+            "class": "Date",
+            "config": {
+                "visibility": {
+                    "inpage": false,
+                    "ineditor": false
+                },
+                "format": "Y-m-d",
+                "prefilltoday": true,
+                "pastonly": false,
+                "futureonly": false,
+                "label": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                },
+                "hint": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                }
+            }
+        },
+        {
+            "colref": 4,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 40,
+            "label": "revision",
+            "class": "Decimal",
+            "config": {
+                "visibility": {
+                    "inpage": false,
+                    "ineditor": false
+                },
+                "min": "",
+                "max": "",
+                "roundto": "-1",
+                "decpoint": ".",
+                "thousands": "",
+                "trimzeros": true,
+                "prefix": "",
+                "postfix": "",
+                "label": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                },
+                "hint": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                }
+            }
+        },
+        {
+            "colref": 5,
+            "ismulti": false,
+            "isenabled": true,
+            "sort": 50,
+            "label": "version",
+            "class": "Text",
+            "config": {
+                "visibility": {
+                    "inpage": false,
+                    "ineditor": false
+                },
+                "prefix": "",
+                "postfix": "",
+                "label": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                },
+                "hint": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                }
+            }
+        },
+        {
+            "colref": 6,
+            "ismulti": false,
+            "isenabled": false,
+            "sort": 60,
+            "label": "test",
+            "class": "Text",
+            "config": {
+                "visibility": {
+                    "inpage": false,
+                    "ineditor": false
+                },
+                "prefix": "",
+                "postfix": "",
+                "label": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                },
+                "hint": {
+                    "en": "",
+                    "de": "",
+                    "fr": ""
+                }
+            }
+        }
+    ]
+}

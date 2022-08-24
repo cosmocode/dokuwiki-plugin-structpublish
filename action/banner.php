@@ -8,87 +8,99 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 {
-    /** @var \helper_plugin_structpublish_permissions */
-    protected $permissionsHelper;
+    /** @var \helper_plugin_structpublish_db */
+    protected $dbHelper;
 
     /**
      * @inheritDoc
      */
     public function register(Doku_Event_Handler $controller)
     {
-        $controller->register_hook('PLUGIN_STRUCT_RENDER_SCHEMA_DATA', 'AFTER', $this, 'renderBanner');
+        $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'renderBanner');
     }
 
     /**
-     * Add banner to struct data of a page
-     *
-     * @return bool
+     * Add banner to pages under structpublish control
      */
     public function renderBanner(Doku_Event $event)
     {
         global $ID;
         global $INFO;
-        $data = $event->data;
-        if (!$data['hasdata'] || $data['format'] !== 'xhtml') return true;
+        global $REV;
 
-        /** @var Doku_Renderer_xhtml $renderer */
-        $renderer = $data['renderer'];
-        $renderer->nocache();
+        if ($event->data !== 'show') return;
 
-        $this->permissionsHelper = plugin_load('helper', 'structpublish_permissions');
-        if (!$this->permissionsHelper->isPublishable()) return true;
+        $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
-        $revision = new Revision($this->permissionsHelper->getDb(), $ID, $INFO['currentrev']);
+        if (!$this->dbHelper->isPublishable()) return;
 
-        $html = $this->getBannerHtml($revision);
-        $renderer->doc .= $html;
+        $revision = new Revision($this->dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
 
-        return true;
+        echo $this->getBannerHtml($revision);
     }
 
     /**
-     * @param Revision $revision
+     * @param Revision $revision latest publish data
      * @return string
      */
     protected function getBannerHtml($revision)
     {
         global $ID;
-        // FIXME use $INFO?
-        $user = $_SERVER['REMOTE_USER'];
-        $html = '';
 
-        if ($this->permissionsHelper->isPublisher($ID, $user)) {
-
-            $actionLinks = $this->linksToHtml($this->permissionsHelper->getActionLinks($revision));
-
-            $html = sprintf(
-                $this->getBannerTemplate(),
-                $revision->getStatus(),
-                $revision->getVersion(),
-                $revision->getStatus(),
-                $actionLinks
-            );
+        $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
+        if ($status === Revision::STATUS_PUBLISHED) {
+            $publisher = userlink($revision->getUser(), true);
+            $publishDate = $revision->getDate();
+        } else {
+            $publisher = userlink($revision->getLatestPublished('user'), true);
+            $publishDate = $revision->getLatestPublished('date');
         }
+
+        $version =  '';
+        if ($revision->getVersion()) {
+            $version = $revision->getVersion() . " ($publishDate, $publisher)";
+
+            if ($status !== Revision::STATUS_PUBLISHED) {
+                $version = sprintf(
+                    '<a href="'. wl($ID, ['rev' => $revision->getLatestPublished('revision')]) . ' ">%s</a>',
+                    $version
+                );
+            }
+        }
+
+        $actionForm = $this->formHtml($status);
+
+        $html = sprintf(
+            $this->getBannerTemplate(),
+            $status,
+            $status,
+            $version,
+            $actionForm
+        );
 
         return $html;
     }
 
-    protected function linksToHtml($links)
+    protected function formHtml($status)
     {
-        $html = '';
-        if (empty($links)) return $html;
-        foreach ($links as $action => $link) {
-            $html .= '<a href="' . $link . '">'. $action .'</a>';
+        if ($status === Revision::STATUS_PUBLISHED) return '';
+
+        $form = new dokuwiki\Form\Form();
+
+        if ($status !== Revision::STATUS_APPROVED) {
+            $form->addButton('structpublish[approve]', 'APPROVE')->attr('type', 'submit');
         }
-        return $html;
+        $form->addButton('structpublish[publish]', 'PUBLISH')->attr('type', 'submit');
+
+        return $form->toHTML();
     }
 
     protected function getBannerTemplate()
     {
         $template = '<div class="plugin-structpublish-banner banner-%s">';
-        $template .= '<div class="plugin-structpublish-version">' . $this->getLang('version') . ': %s</div>';
         $template .= '<div class="plugin-structpublish-status">' . $this->getLang('status') . ': %s</div>';
-        $template .= '<div class="plugin-structpublish-actions">' . $this->getLang('actions') . ': %s</div>';
+        $template .= '<div class="plugin-structpublish-version">' . $this->getLang('version') . ': %s</div>';
+        $template .= '<div class="plugin-structpublish-actions">%s</div>';
         $template .= '</div>';
 
         return $template;

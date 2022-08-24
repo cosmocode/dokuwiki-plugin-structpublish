@@ -6,15 +6,22 @@
  */
 
 // menu entry for admin plugins
-// $lang['menu'] = 'Your menu entry';
+ $lang['menu'] = 'Structured publish data';
 
-// custom language strings for the plugin
- $lang['version'] = 'version';
- $lang['status'] = 'status';
- $lang['actions'] = 'actions';
- $lang['status_draft'] = 'draft';
- $lang['status_approved'] = 'approved';
- $lang['status_published'] = 'published';
- $lang['action_approve'] = 'approve';
- $lang['action_publish'] = 'publish';
+// banner
+ $lang['version'] = 'Version';
+ $lang['status'] = 'Publish status of the page you are currently viewing';
+ $lang['actions'] = 'Actions';
+ $lang['status_draft'] = 'Draft';
+ $lang['status_approved'] = 'Approved';
+ $lang['status_published'] = 'Published';
+ $lang['action_approve'] = 'Approve';
+ $lang['action_publish'] = 'Publish';
+
+ // admin
+ $lang['assign_pattern'] = 'Pattern';
+ $lang['assign_user'] = 'User or @group';
+ $lang['assign_status'] = 'Status';
+ $lang['assign_add'] = 'Add assignment';
+ $lang['assign_del'] = 'Remove assignment';
 

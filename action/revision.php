@@ -1,10 +1,11 @@
 <?php
 
 use dokuwiki\plugin\struct\meta\StructException;
+use dokuwiki\plugin\structpublish\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
 /**
- * Action component to create draft revisions
+ * Action component to handle page save
  */
 class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
 {
@@ -13,18 +14,27 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
      */
     public function register(Doku_Event_Handler $controller)
     {
-        $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'saveDraft');
+        $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'handleSave');
     }
 
-    public function saveDraft(Doku_Event $event)
+    public function handleSave(Doku_Event $event)
     {
-        /** @var helper_plugin_structpublish_permissions $permissionsHelper */
-        $permissionsHelper = plugin_load('helper', 'structpublish_permissions');
+        /** @var helper_plugin_structpublish_db $dbHelper */
+        $dbHelper = plugin_load('helper', 'structpublish_db');
 
-        // FIXME evaluate changeType
+        // FIXME evaluate changeType?
         $id = $event->data['id'];
-        $revision = new Revision($permissionsHelper->getDb(), $id, $event->data['newRevision']);
+
+        // before checking for isPublishable() we have to update assignments
+        $assignments = Assignments::getInstance();
+        $assignments->updatePageAssignments($id);
+
+        if (!$dbHelper->isPublishable()) return;
+
+        $revision = new Revision($dbHelper->getDB(), $id, $event->data['newRevision']);
         $revision->setStatus(Revision::STATUS_DRAFT);
+        $revision->setVersion($revision->getLatestPublished('version'));
+
         try {
             $revision->save();
         } catch (StructException $e) {

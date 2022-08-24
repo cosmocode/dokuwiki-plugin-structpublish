@@ -27,7 +27,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         // check whether we are already up-to-date
         list($dbVersionStruct, $dbVersionStructpublish) = $this->getDbVersions($sqlite);
-        if (isset($dbVersionStructpublish) && $dbVersionStructpublish === $dbVersionStruct) {
+        if (isset($dbVersionStructpublish) && (string)$dbVersionStructpublish == (string)$dbVersionStruct) {
             return $ok;
         }
 
@@ -90,7 +90,6 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * Database setup, required struct db version is 19
      *
      * @param helper_plugin_sqlite $sqlite
-     * @param array $schema
      * @return bool
      */
     protected function migration19($sqlite)
@@ -101,6 +100,15 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         array_unshift($sql, 'BEGIN TRANSACTION');
         array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (19,'dbversion_structpublish')");
         array_push($sql, "COMMIT TRANSACTION");
-        return $sqlite->doTransaction($sql);
+        $ok =  $sqlite->doTransaction($sql);
+
+        if ($ok) {
+            $file = __DIR__ . "../db/json/structpublish_19.struct.json";
+            $schemaJson = file_get_contents($file);
+            $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
+            $ok = (bool)$importer->build();
+        }
+
+        return $ok;
     }
 }

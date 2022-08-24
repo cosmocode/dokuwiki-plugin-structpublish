@@ -2,19 +2,37 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
+use dokuwiki\plugin\struct\meta\ConfigParser;
+use dokuwiki\plugin\struct\meta\Schema;
+use dokuwiki\plugin\struct\meta\SearchConfig;
+use dokuwiki\plugin\struct\meta\Value;
+
 class Revision
 {
     const STATUS_DRAFT = 'draft';
     const STATUS_APPROVED = 'approved';
     const STATUS_PUBLISHED = 'published';
 
+    /** @var \helper_plugin_sqlite */
     protected $sqlite;
-    protected $schemas;
+
+    protected $schema;
+
     protected $id;
     protected $rev;
+    protected $published;
     protected $status;
-    protected $version = 0;
+    protected $version;
     protected $user;
+    protected $date;
+    /**
+     * @var bool|\dokuwiki\plugin\struct\meta\Column
+     */
+    protected $statusCol;
+    protected $versionCol;
+    protected $userCol;
+    protected $dateCol;
+    protected $revisionCol;
 
     /**
      * @param $sqlite
@@ -26,55 +44,41 @@ class Revision
         $this->sqlite = $sqlite;
         $this->id = $id;
         $this->rev = $rev;
+        $this->published = 0;
 
-        $sql = 'SELECT * FROM structpublish_revisions WHERE id = ? AND rev = ?';
-        $res = $sqlite->query($sql, $id, $rev);
-        $vals = $sqlite->res2row($res);
+        $this->schema = new Schema('structpublish');
+        $this->statusCol = $this->schema->findColumn('status');
+        $this->versionCol = $this->schema->findColumn('version');
+        $this->userCol = $this->schema->findColumn('user');
+        $this->dateCol = $this->schema->findColumn('date');
+        $this->revisionCol = $this->schema->findColumn('revision');
 
-        if (!empty($vals)) {
-            $this->status = $vals['status'];
-            $this->version = $vals['version'];
-            $this->user = $vals['user'];
+        /** @var Value[] $values */
+        $values = $this->getCoreData('revision=' . $this->rev);
+
+        if (!empty($values)) {
+            $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
+            $this->version = $values[$this->versionCol->getColref() - 1]->getRawValue();
+            $this->user = $values[$this->userCol->getColref() - 1]->getRawValue();
+            $this->date = $values[$this->dateCol->getColref() - 1]->getRawValue();
         }
     }
 
     public function save()
     {
-        // TODO reset publish status of older revisions
-        $sql = 'REPLACE INTO structpublish_revisions (id, rev, status, version, user) VALUES (?,?,?,?,?)';
-        $res = $this->sqlite->query(
-            $sql,
-            $this->id,
-            $this->rev,
-            $this->status,
-            $this->version,
-            $this->user
-        );
+        // drafts reference the latest version
+        if ($this->status === self::STATUS_DRAFT) {
+            //FIXME no rev yet
+            $this->setVersion($this->getVersion());
+        }
 
         if ($this->status === self::STATUS_PUBLISHED) {
-            $this->updateCoreData();
+            $this->published = 1;
         }
-    }
 
-    /**
-     * Returns the latest version for a given id, or 0
-     *
-     * @return int
-     */
-    public function getLatestVersion()
-    {
-        $sql = 'SELECT MAX(version) AS latest FROM structpublish_revisions WHERE id = ?';
-        $res = $this->sqlite->query($sql, $this->id);
-        $res = $this->sqlite->res2arr($res);
-        return $res['latest'] ?? 0;
-    }
+        $this->updateCoreData($this->id);
+        // TODO reset publish status of older revisions
 
-    /**
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->id;
     }
 
     /**
@@ -82,7 +86,7 @@ class Revision
      */
     public function getVersion()
     {
-        return $this->version;
+        return (int)$this->version;
     }
 
     /**
@@ -114,7 +118,7 @@ class Revision
      */
     public function getStatus()
     {
-        return $this->status ?? self::STATUS_DRAFT;
+        return $this->status;
     }
 
     /**
@@ -141,13 +145,74 @@ class Revision
         $this->user = $user;
     }
 
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function setDate($time)
+    {
+        $this->date = date('Y-m-d', $time);
+    }
+
     /**
      * Update publish status in the core table
      */
-    protected function updateCoreData()
+    protected function updateCoreData($pid, $rid = 0)
     {
-        // FIXME we don't know anything about schemas yet!
-//        $sql = 'UPDATE data_schema SET published = NULL WHERE id = ?';
-//        $this->sqlite->query($sql, $this->id);
+        $data = [
+            'status' => $this->status,
+            'user' => $this->user,
+            'date' => $this->date,
+            'revision' => $this->rev,
+            'version' => $this->version,
+        ];
+        $schema = new Schema('structpublish', 0);
+        $access = new AccessTableStructpublish($schema, $pid, 0, $rid);
+        $access->setPublished($this->published);
+        $access->saveData($data);
+    }
+
+    public function getCoreData($andFilter = '')
+    {
+        $lines = [
+            'schema: structpublish',
+            'cols: *',
+            'filter: %pageid% = $ID$'
+        ];
+
+        if ($andFilter) {
+            $lines[] = 'filter: ' . $andFilter;
+        }
+
+        $parser = new ConfigParser($lines);
+        $config = $parser->getConfig();
+        $search = new SearchConfig($config, $this->sqlite);
+        $data = $search->execute();
+        if (!empty($data)) {
+            // FIXME
+            return $data[array_key_last($data)];
+        }
+        return [];
+    }
+
+    /**
+     * Get a property of the latest published revision associated with the current one
+     *
+     * @param string $key
+     * @return string
+     */
+    public function getLatestPublished($key)
+    {
+        $latestPublished = $this->getCoreData('status=' . self::STATUS_PUBLISHED);
+        $data = [
+            'status' => $latestPublished[$this->statusCol->getColref() - 1]->getRawValue(),
+            'user' => $latestPublished[$this->userCol->getColref() - 1]->getRawValue(),
+            'date' => $latestPublished[$this->dateCol->getColref() - 1]->getRawValue(),
+            'revision' => $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue(),
+            'version' => $latestPublished[$this->versionCol->getColref() - 1]->getRawValue(),
+        ];
+
+        return $data[$key] ?? '';
     }
 }
