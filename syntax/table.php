@@ -24,18 +24,6 @@ class syntax_plugin_structpublish_table extends syntax_plugin_struct_serial
     }
 
     /**
-     * Will pass our database helper with overwritten IS_PUBLISHER() to Search
-     *
-     * @return helper_plugin_sqlite
-     */
-    protected function getDb()
-    {
-        /** @var helper_plugin_structpublish_db $helper */
-        $helper = plugin_load('helper', 'structpublish_db');
-        return $helper->getDB();
-    }
-
-    /**
      * Filter based on primary key columns
      *
      * @param array $config
