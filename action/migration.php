@@ -100,6 +100,15 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         array_unshift($sql, 'BEGIN TRANSACTION');
         array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (19,'dbversion_structpublish')");
         array_push($sql, "COMMIT TRANSACTION");
-        return $sqlite->doTransaction($sql);
+        $ok =  $sqlite->doTransaction($sql);
+
+        if ($ok) {
+            $file = __DIR__ . "../db/json/structpublish_19.struct.json";
+            $schemaJson = file_get_contents($file);
+            $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
+            $ok = (bool)$importer->build();
+        }
+
+        return $ok;
     }
 }
