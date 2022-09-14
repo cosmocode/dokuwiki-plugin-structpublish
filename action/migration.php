@@ -2,6 +2,8 @@
 
 class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 {
+    const MIN_DB_STRUCT = 19;
+
     /**
      * @inheritDoc
      */
@@ -20,21 +22,31 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     {
         /** @var \helper_plugin_struct_db $helper */
         $helper = plugin_load('helper', 'struct_db');
+
+        // abort if struct is not installed
+        if (!$helper) {
+            throw new Exception('Plugin struct is required!');
+        }
+
         $sqlite = $helper->getDB();
 
         $ok = true;
 
-        // check whether we are already up-to-date
         list($dbVersionStruct, $dbVersionStructpublish) = $this->getDbVersions($sqlite);
-        if (isset($dbVersionStructpublish) && (string)$dbVersionStructpublish == (string)$dbVersionStruct) {
+
+        // check if struct has required version
+        if ($dbVersionStruct < self::MIN_DB_STRUCT) {
+            throw new Exception('Plugins struct is outdated. Minimum required database version is ' . self::MIN_DB_STRUCT);
+        }
+
+        // check whether we are already up-to-date
+        $latestVersion = $this->getLatestVersion();
+        if (isset($dbVersionStructpublish) && (int)$dbVersionStructpublish >= $latestVersion) {
             return $ok;
         }
 
-        // check whether we have any pending migrations for the current version of struct db
-        $pending = array_filter(array_map(function ($version) use ($dbVersionStruct) {
-            return $version >= $dbVersionStruct &&
-            is_callable([$this, "migration$version"]) ? $version : null;
-        }, $this->diffVersions($dbVersionStruct, $dbVersionStructpublish)));
+        // check whether we have any pending migrations
+        $pending = range($dbVersionStructpublish ?: 1, $latestVersion);
         if (empty($pending)) {
             return $ok;
         }
@@ -46,19 +58,6 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         }
 
         return $ok;
-    }
-
-    /**
-     * Detect which migrations should be executed. Start conservatively with version 1.
-     *
-     * @param int $dbVersionStruct Current version of struct DB as found in 'opts' table
-     * @param int|null $dbVersionStructpublish Current version in 'opts', may not exist yet
-     * @return int[]
-     */
-    protected function diffVersions($dbVersionStruct, $dbVersionStructpublish)
-    {
-        $pluginDbVersion = $dbVersionStructpublish ?: 1;
-        return range($pluginDbVersion, $dbVersionStruct);
     }
 
     /**
@@ -86,23 +85,31 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     }
 
     /**
-     * Database setup, required struct db version is 19
+     * @return int
+     */
+    protected function getLatestVersion()
+    {
+        return (int)trim(file_get_contents(DOKU_PLUGIN . 'structpublish/db/latest.version', false));
+    }
+
+    /**
+     * Database setup
      *
      * @param helper_plugin_sqlite $sqlite
      * @return bool
      */
-    protected function migration19($sqlite)
+    protected function migration1($sqlite)
     {
-        $sql = io_readFile(DOKU_PLUGIN . 'structpublish/db/struct/update0019.sql', false);
+        $sql = io_readFile(DOKU_PLUGIN . 'structpublish/db/update0001.sql', false);
 
         $sql = $sqlite->SQLstring2array($sql);
         array_unshift($sql, 'BEGIN TRANSACTION');
-        array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (19,'dbversion_structpublish')");
+        array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')");
         array_push($sql, "COMMIT TRANSACTION");
         $ok =  $sqlite->doTransaction($sql);
 
         if ($ok) {
-            $file = __DIR__ . "/../db/json/structpublish_19.struct.json";
+            $file = DOKU_PLUGIN . 'structpublish/db/json/structpublish0001.struct.json';
             $schemaJson = file_get_contents($file);
             $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
             $ok = (bool)$importer->build();

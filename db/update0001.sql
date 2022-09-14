@@ -10,5 +10,5 @@ CREATE TABLE structpublish_assignments (
      user TEXT NOT NULL,
      status TEXT NOT NULL,
      assigned INTEGER,
-     PRIMARY KEY(pid, user, status, assigned)
+     PRIMARY KEY(pid, user, status)
 );

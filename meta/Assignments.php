@@ -115,7 +115,7 @@ class Assignments
 
         // reevalute the pages and unassign when needed
         foreach ($pagerows as $row) {
-            $rules = $this->getPageAssignments($row['pid'], true);
+            $rules = $this->getPageAssignments($row['pid'], false);
             // remove assignments matching the rule
             foreach ($rules as $status => $users) {
                 foreach ($users as $user) {
