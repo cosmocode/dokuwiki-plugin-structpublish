@@ -208,11 +208,11 @@ class Assignments
     }
 
     /**
-     * Returns a list of users per status assigned to the given page
+     * Returns a list of user/group string lists per status assigned to the given page
      *
      * @param string $page
      * @param bool $checkpatterns Should the current patterns be re-evaluated?
-     * @return array users assigned
+     * @return array users assigned [role => [user, ...], ...]
      */
     public function getPageAssignments($page, $checkpatterns = true)
     {

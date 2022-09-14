@@ -4,8 +4,6 @@ use dokuwiki\plugin\structpublish\meta\Assignments;
 
 class helper_plugin_structpublish_db extends helper_plugin_struct_db
 {
-    const ACTION_APPROVE = 'approve';
-    const ACTION_PUBLISH = 'publish';
 
     /**
      * Get list of all pages known to the plugin

@@ -1,6 +1,7 @@
 <?php
 
 use dokuwiki\plugin\structpublish\meta\Assignments;
+use dokuwiki\plugin\structpublish\meta\Constants;
 
 /**
  * DokuWiki Plugin structpublish (Admin Component)
@@ -130,7 +131,7 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
         echo '<td><input type="text" name="assignment[pattern]" /></td>';
         echo '<td>';
         echo '<select name="assignment[status]">';
-        foreach (['approve', 'publish'] as $status) {
+        foreach ([Constants::ACTION_APPROVE, Constants::ACTION_PUBLISH] as $status) {
             echo '<option value="' . $status . '">' . $status . '</option>';
         }
         echo '</select>';

@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
 class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
@@ -29,7 +30,7 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         /** @var action_plugin_structpublish_sqlitefunction $functions */
         $functions = plugin_load('action', 'structpublish_sqlitefunction');
         if (
-            $currentRevision->getStatus() !== Revision::STATUS_PUBLISHED
+            $currentRevision->getStatus() !== Constants::STATUS_PUBLISHED
             && !$functions->IS_PUBLISHER($ID)
         ) {
             $latestPublishedRev = $currentRevision->getLatestPublished('revision');

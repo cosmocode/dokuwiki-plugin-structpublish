@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
 /**
@@ -47,8 +48,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     {
         global $ID;
 
-        $status = $revision->getStatus() ?: Revision::STATUS_DRAFT;
-        if ($status === Revision::STATUS_PUBLISHED) {
+        $status = $revision->getStatus() ?: Constants::STATUS_DRAFT;
+        if ($status === Constants::STATUS_PUBLISHED) {
             $publisher = userlink($revision->getUser(), true);
             $publishDate = $revision->getDate();
         } else {
@@ -60,7 +61,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         if ($revision->getVersion()) {
             $version = $revision->getVersion() . " ($publishDate, $publisher)";
 
-            if ($status !== Revision::STATUS_PUBLISHED) {
+            if ($status !== Constants::STATUS_PUBLISHED) {
                 $version = sprintf(
                     '<a href="'. wl($ID, ['rev' => $revision->getLatestPublished('revision')]) . ' ">%s</a>',
                     $version
@@ -83,13 +84,16 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 
     protected function formHtml($status)
     {
-        if ($status === Revision::STATUS_PUBLISHED) return '';
+        global $ID;
+        if ($status === Constants::STATUS_PUBLISHED) return '';
 
         $form = new dokuwiki\Form\Form();
 
-        if ($status !== Revision::STATUS_APPROVED) {
+        if ($status !== Constants::STATUS_APPROVED) {
             $form->addButton('structpublish[approve]', 'APPROVE')->attr('type', 'submit');
         }
+
+
         $form->addButton('structpublish[publish]', 'PUBLISH')->attr('type', 'submit');
 
         return $form->toHTML();

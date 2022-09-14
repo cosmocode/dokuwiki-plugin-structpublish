@@ -2,6 +2,7 @@
 
 use dokuwiki\plugin\struct\meta\StructException;
 use dokuwiki\plugin\structpublish\meta\Assignments;
+use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
 /**
@@ -32,7 +33,7 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
         if (!$dbHelper->isPublishable()) return;
 
         $revision = new Revision($dbHelper->getDB(), $id, $event->data['newRevision']);
-        $revision->setStatus(Revision::STATUS_DRAFT);
+        $revision->setStatus(Constants::STATUS_DRAFT);
         $revision->setVersion($revision->getLatestPublished('version'));
 
         try {

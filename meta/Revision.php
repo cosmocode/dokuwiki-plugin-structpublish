@@ -9,10 +9,6 @@ use dokuwiki\plugin\struct\meta\Value;
 
 class Revision
 {
-    const STATUS_DRAFT = 'draft';
-    const STATUS_APPROVED = 'approved';
-    const STATUS_PUBLISHED = 'published';
-
     /** @var \helper_plugin_sqlite */
     protected $sqlite;
 
@@ -67,12 +63,12 @@ class Revision
     public function save()
     {
         // drafts reference the latest version
-        if ($this->status === self::STATUS_DRAFT) {
+        if ($this->status === Constants::STATUS_DRAFT) {
             //FIXME no rev yet
             $this->setVersion($this->getVersion());
         }
 
-        if ($this->status === self::STATUS_PUBLISHED) {
+        if ($this->status === Constants::STATUS_PUBLISHED) {
             $this->published = 1;
         }
 
@@ -204,7 +200,7 @@ class Revision
      */
     public function getLatestPublished($key)
     {
-        $latestPublished = $this->getCoreData('status=' . self::STATUS_PUBLISHED);
+        $latestPublished = $this->getCoreData('status=' . Constants::STATUS_PUBLISHED);
         if (!$latestPublished) return '';
 
         $data = [

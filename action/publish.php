@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
 class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
@@ -24,11 +25,11 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
 
         global $INPUT;
         $in = $INPUT->arr('structpublish');
-        if (!$in || !isset($in[$this->dbHelper::ACTION_PUBLISH])) {
+        if (!$in || !isset($in[Constants::ACTION_PUBLISH])) {
             return;
         }
 
-        $this->saveRevision(Revision::STATUS_PUBLISHED);
+        $this->saveRevision(Constants::STATUS_PUBLISHED);
 
         $this->updateSchemaData();
 
@@ -42,11 +43,11 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
 
         global $INPUT;
         $in = $INPUT->arr('structpublish');
-        if (!$in || !isset($in[$this->dbHelper::ACTION_APPROVE])) {
+        if (!$in || !isset($in[Constants::ACTION_APPROVE])) {
             return;
         }
 
-        $this->saveRevision(Revision::STATUS_APPROVED);
+        $this->saveRevision(Constants::STATUS_APPROVED);
     }
 
     /**
@@ -65,7 +66,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         $revision = new Revision($sqlite, $ID, $INFO['currentrev']);
 
         // TODO do not autoincrement version, make it a string
-        if ($status === Revision::STATUS_PUBLISHED) {
+        if ($status === Constants::STATUS_PUBLISHED) {
             $revision->setVersion($revision->getVersion() + 1);
         }
         $revision->setUser($_SERVER['REMOTE_USER']);
