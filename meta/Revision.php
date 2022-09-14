@@ -191,7 +191,7 @@ class Revision
      * If $rev is specified, "latest" means relative to the $rev revision.
      *
      * @param int|null $rev
-     * @return Revision
+     * @return Revision|null
      */
     public function getLatestPublishedRevision($rev = null)
     {
@@ -201,7 +201,12 @@ class Revision
         }
         $latestPublished = $this->getCoreData($andFilter);
 
+        if (empty($latestPublished)) {
+            return null;
+        }
+
         $published = new Revision($this->sqlite, $this->id, $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue());
+
         $published->setStatus($latestPublished[$this->statusCol->getColref() - 1]->getRawValue());
         $published->setUser($latestPublished[$this->userCol->getColref() - 1]->getRawValue());
         $published->setDate($latestPublished[$this->dateCol->getColref() - 1]->getRawValue());
