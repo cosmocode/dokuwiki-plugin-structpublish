@@ -77,7 +77,7 @@ class Assignments
         // reload patterns
         $this->loadPatterns();
 
-        // FIXME update assignments
+        // update assignments
         // fetch known pages
         /** @var \helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');

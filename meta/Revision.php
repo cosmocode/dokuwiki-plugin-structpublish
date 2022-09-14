@@ -62,12 +62,6 @@ class Revision
 
     public function save()
     {
-        // drafts reference the latest version
-        if ($this->status === Constants::STATUS_DRAFT) {
-            //FIXME no rev yet
-            $this->setVersion($this->getVersion());
-        }
-
         if ($this->status === Constants::STATUS_PUBLISHED) {
             $this->published = 1;
         }
