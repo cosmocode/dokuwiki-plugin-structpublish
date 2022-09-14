@@ -28,7 +28,7 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
 
         // before checking for isPublishable() we have to update assignments
         $assignments = Assignments::getInstance();
-        $assignments->updatePageAssignments($id);
+        $assignments->updatePageAssignments($id, true);
 
         if (!$dbHelper->isPublishable()) return;
 

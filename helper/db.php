@@ -9,16 +9,13 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
      * Get list of all pages known to the plugin
      * @return array
      */
-    public function getPages($pid = null)
+    public function getPages()
     {
-        $sql = 'SELECT pid FROM data_structpublish';
-        if ($pid) {
-            $sql .= ' WHERE pid = ?';
-        }
-        $res = $this->sqlite->query($sql, $pid);
+        $sql = 'SELECT pid FROM titles';
+        $res = $this->sqlite->query($sql);
         $list = $this->sqlite->res2arr($res);
         $this->sqlite->res_close($res);
-        return $list;
+        return array_column($list, 'pid');
     }
 
     /**
@@ -30,7 +27,7 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
     {
         global $ID;
 
-        $sql = 'SELECT * FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
+        $sql = 'SELECT pid FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
         $res = $this->sqlite->query($sql, $ID);
         if ($res && $this->sqlite->res2count($res)) {
             return true;

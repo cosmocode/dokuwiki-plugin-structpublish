@@ -77,7 +77,15 @@ class Assignments
         // reload patterns
         $this->loadPatterns();
 
-        // FIXME how to update / propagate assignments?
+        // FIXME update assignments
+        // fetch known pages
+        /** @var \helper_plugin_structpublish_db $dbHelper */
+        $dbHelper = plugin_load('helper', 'structpublish_db');
+        $pids = $dbHelper->getPages();
+
+        foreach ($pids as $pid) {
+            $this->updatePageAssignments($pid);
+        }
 
         return $ok;
     }
@@ -124,10 +132,11 @@ class Assignments
      *
      * @param string $pid
      */
-    public function updatePageAssignments($pid)
+    public function updatePageAssignments($pid, $reload = false)
     {
-        // reload patterns
-        $this->loadPatterns();
+        if ($reload) {
+            $this->loadPatterns();
+        }
         $rules = $this->getPageAssignments($pid, true);
 
         foreach ($rules as $status => $users) {
@@ -135,11 +144,6 @@ class Assignments
                 $this->assignPage($pid, $user, $status);
             }
         }
-
-        // fetch known pages
-        /** @var \helper_plugin_structpublish_db $helper */
-        $helper = plugin_load('helper', 'structpublish_db');
-        $pages = $helper->getPages($pid);
 
         // FIXME reevalute existing assignments
     }
