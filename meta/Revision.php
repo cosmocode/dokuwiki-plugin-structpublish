@@ -187,24 +187,26 @@ class Revision
     }
 
     /**
-     * Get a property of the latest published revision associated with the current one
+     * Return "latest" published revision of a given page.
+     * If $rev is specified, "latest" means relative to the $rev revision.
      *
-     * @param string $key
-     * @return string
+     * @param int|null $rev
+     * @return Revision
      */
-    public function getLatestPublished($key)
+    public function getLatestPublishedRevision($rev = null)
     {
-        $latestPublished = $this->getCoreData('status=' . Constants::STATUS_PUBLISHED);
-        if (!$latestPublished) return '';
+        $andFilter = 'status=' . Constants::STATUS_PUBLISHED;
+        if ($rev) {
+            $andFilter .= ' AND revision < ' . $rev;
+        }
+        $latestPublished = $this->getCoreData($andFilter);
 
-        $data = [
-            'status' => $latestPublished[$this->statusCol->getColref() - 1]->getRawValue(),
-            'user' => $latestPublished[$this->userCol->getColref() - 1]->getRawValue(),
-            'date' => $latestPublished[$this->dateCol->getColref() - 1]->getRawValue(),
-            'revision' => $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue(),
-            'version' => $latestPublished[$this->versionCol->getColref() - 1]->getRawValue(),
-        ];
+        $published = new Revision($this->sqlite, $this->id, $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue());
+        $published->setStatus($latestPublished[$this->statusCol->getColref() - 1]->getRawValue());
+        $published->setUser($latestPublished[$this->userCol->getColref() - 1]->getRawValue());
+        $published->setDate($latestPublished[$this->dateCol->getColref() - 1]->getRawValue());
+        $published->setVersion($latestPublished[$this->versionCol->getColref() - 1]->getRawValue());
 
-        return $data[$key] ?? '';
+        return $published;
     }
 }

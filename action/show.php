@@ -33,7 +33,7 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
             $currentRevision->getStatus() !== Constants::STATUS_PUBLISHED
             && !$functions->IS_PUBLISHER($ID)
         ) {
-            $latestPublishedRev = $currentRevision->getLatestPublished('revision');
+            $latestPublishedRev = $currentRevision->getLatestPublishedRevision()->getRev();
             if (!$latestPublishedRev) {
                 $event->data = 'denied';
                 // FIXME we could add our own action to display a custom message instead of standard denied action

@@ -53,8 +53,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $publisher = userlink($revision->getUser(), true);
             $publishDate = $revision->getDate();
         } else {
-            $publisher = userlink($revision->getLatestPublished('user'), true);
-            $publishDate = $revision->getLatestPublished('date');
+            $publisher = userlink($revision->getLatestPublishedRevision()->getUser(), true);
+            $publishDate = $revision->getLatestPublishedRevision()->getDate();
         }
 
         $version =  '';
@@ -63,7 +63,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 
             if ($status !== Constants::STATUS_PUBLISHED) {
                 $version = sprintf(
-                    '<a href="'. wl($ID, ['rev' => $revision->getLatestPublished('revision')]) . ' ">%s</a>',
+                    '<a href="'. wl($ID, ['rev' => $revision->getLatestPublishedRevision()->getRev()]) . ' ">%s</a>',
                     $version
                 );
             }
