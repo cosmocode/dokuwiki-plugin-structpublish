@@ -32,17 +32,38 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
         $grps = $args[2] ?? ($USERINFO['grps'] ?? []);
 
         return $this->userHasRole(
-            [\helper_plugin_structpublish_db::ACTION_PUBLISH, \helper_plugin_structpublish_db::ACTION_APPROVE],
+            $pid,
             $userId,
-            $grps,
-            $pid
+            $grps
         );
     }
 
-    protected function userHasRole($roles, $userId, $grps, $pid)
+    /**
+     * Check if a given user has role assignment for a given page
+     *
+     * @param string $pid Page to check
+     * @param string $userId User login name, current user if empty
+     * @param string[] $grps Groups the user has, current user's groups if empty user
+     * @param string[] $roles Roles the user should have, empty for any role
+     * @return bool
+     */
+    public static function userHasRole($pid, $userId = '', $grps = [], $roles = [])
     {
+        global $INPUT;
+        global $USERINFO;
+
+        if (blank($userId)) {
+            $userId = $INPUT->server->str('REMOTE_USER');
+            $grps = $USERINFO['grps'] ?? [];
+        }
+
         $assignments = Assignments::getInstance();
         $rules = $assignments->getPageAssignments($pid);
+
+        // if no roles are given, any role is fine
+        if (empty($roles)) {
+            return auth_isMember(implode(',', array_values($rules)), $userId, $grps);
+        }
 
         foreach ($roles as $role) {
             if (isset($rules[$role])) {
@@ -55,4 +76,5 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
 
         return false;
     }
+
 }

@@ -39,4 +39,17 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
         }
         return false;
     }
+
+    /**
+     * Check if the current user has the given roles on the current page
+     *
+     * @param string $pid The page ID to check access for
+     * @param string[] $roles Roles needed. Empty for any role
+     * @return bool
+     */
+    public function checkAccess($pid, $roles = [])
+    {
+        return action_plugin_structpublish_sqlitefunction::userHasRole($pid, '', [], $roles);
+    }
+
 }
