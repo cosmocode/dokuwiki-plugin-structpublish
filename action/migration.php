@@ -103,7 +103,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         $ok =  $sqlite->doTransaction($sql);
 
         if ($ok) {
-            $file = __DIR__ . "../db/json/structpublish_19.struct.json";
+            $file = __DIR__ . "/../db/json/structpublish_19.struct.json";
             $schemaJson = file_get_contents($file);
             $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
             $ok = (bool)$importer->build();
