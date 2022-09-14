@@ -62,7 +62,11 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
 
         // if no roles are given, any role is fine
         if (empty($roles)) {
-            return auth_isMember(implode(',', array_values($rules)), $userId, $grps);
+            return auth_isMember(
+                implode(',', array_merge(...array_values($rules))),
+                $userId,
+                $grps
+            );
         }
 
         foreach ($roles as $role) {
