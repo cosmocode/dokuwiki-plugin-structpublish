@@ -23,7 +23,9 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
      */
     public function handlePublish(Doku_Event $event)
     {
-        if ($event->data != 'show') return;
+        if ($event->data != 'show') {
+            return;
+        }
 
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
@@ -33,7 +35,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
             return;
         }
 
-        if(checkSecurityToken()) {
+        if (checkSecurityToken()) {
             $this->saveRevision(Constants::STATUS_PUBLISHED, $INPUT->str('version'));
             $this->updateSchemaData();
         }
@@ -47,7 +49,9 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
      */
     public function handleApprove(Doku_Event $event)
     {
-        if ($event->data != 'show') return;
+        if ($event->data != 'show') {
+            return;
+        }
 
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
@@ -57,7 +61,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
             return;
         }
 
-        if(checkSecurityToken()) {
+        if (checkSecurityToken()) {
             $this->saveRevision(Constants::STATUS_APPROVED);
         }
     }
@@ -65,14 +69,27 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     /**
      * Save publish data
      *
-     * @todo check user role
      * @param string $status
      * @return void
      */
-    protected function saveRevision($status, $newversion='')
+    protected function saveRevision($status, $newversion = '')
     {
         global $ID;
         global $INFO;
+
+        if (
+            $status === Constants::STATUS_PUBLISHED &&
+            !$this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])
+        ) {
+            throw new \Exception('User may not publish');
+        }
+
+        if (
+            $status === Constants::STATUS_APPROVED &&
+            !$this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
+        ) {
+            throw new \Exception('User may not approve');
+        }
 
         // FIXME prevent bumping an already published revision
         $sqlite = $this->dbHelper->getDB();
@@ -100,14 +117,18 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         $schemaAssignments = \dokuwiki\plugin\struct\meta\Assignments::getInstance();
         $tables = $schemaAssignments->getPageAssignments($ID);
 
-        if (empty($tables)) return;
+        if (empty($tables)) {
+            return;
+        }
 
         $sqlite = $this->dbHelper->getDB();
 
         foreach ($tables as $table) {
             // TODO unpublish earlier revisions
-            $sqlite->query( "UPDATE data_$table SET published = 1 WHERE pid = ? AND rev = ?", [$ID, $INFO['currentrev']]);
-            $sqlite->query( "UPDATE multi_$table SET published = 1 WHERE pid = ? AND rev = ?", [$ID, $INFO['currentrev']]);
+            $sqlite->query("UPDATE data_$table SET published = 1 WHERE pid = ? AND rev = ?",
+                [$ID, $INFO['currentrev']]);
+            $sqlite->query("UPDATE multi_$table SET published = 1 WHERE pid = ? AND rev = ?",
+                [$ID, $INFO['currentrev']]);
         }
     }
 }
