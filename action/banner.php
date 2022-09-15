@@ -50,14 +50,16 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $banner = '<div class="plugin-structpublish-banner ' . $shownRevision->getStatus() . '">';
 
         // status of the shown revision
-        $banner .= inlineSVG(__DIR__ . '/../ico/' . $shownRevision->getStatus() . '.svg');
+        $banner .= '<span class="icon">' .
+            inlineSVG(__DIR__ . '/../ico/' . $shownRevision->getStatus() . '.svg') .
+            '</span>';
         $banner .= $this->getBannerText('status_' . $shownRevision->getStatus(), $shownRevision);
 
         // link to previous or newest published version
         if ($latestpubRevision !== null && $shownRevision->getRev() < $latestpubRevision->getRev()) {
-            $banner .= $this->getBannerText('latest_publish', $latestpubRevision);
+            $banner .= $this->getBannerText('latest_publish', $latestpubRevision, $shownRevision->getRev());
         } else {
-            $banner .= $this->getBannerText('previous_publish', $prevpubRevision);
+            $banner .= $this->getBannerText('previous_publish', $prevpubRevision, $shownRevision->getRev());
         }
 
         // link to newest draft, if exists, is not shown already and user has a role
@@ -66,7 +68,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $newestRevision->getStatus() != Constants::STATUS_PUBLISHED &&
             $this->dbHelper->checkAccess($ID)
         ) {
-            $banner .= $this->getBannerText('latest_draft', $newestRevision);
+            $banner .= $this->getBannerText('latest_draft', $newestRevision, $shownRevision->getRev());
         }
 
         // action buttons
@@ -84,11 +86,11 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /**
      * Fills place holder texts with data from the given Revision
      *
-     * @param string $text
+     * @param string $name
      * @param Revision $rev
      * @return string
      */
-    protected function getBannerText($text, $rev)
+    protected function getBannerText($name, $rev, $diff = '')
     {
         if ($rev === null) {
             return '';
@@ -98,13 +100,20 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             '{user}' => userlink($rev->getUser()),
             '{revision}' => $this->makeLink($rev->getId(), $rev->getRev(), dformat($rev->getRev())),
             '{datetime}' => $this->makeLink($rev->getId(), $rev->getRev(), dformat($rev->getTimestamp())),
-            '{version}' => hsc($rev->getVersion()),
+            '{version}' => '<span class="plugin-structpublish-version">' . hsc($rev->getVersion()) . '</span>',
         ];
 
-        $text = $this->getLang("banner_$text");
+        $text = $this->getLang("banner_$name");
         $text = strtr($text, $replace);
 
-        return "<p>$text</p>";
+        // add link to diff view
+        if ($diff && $diff !== $rev->getRev()) {
+            $link = wl($rev->getId(), ['do' => 'diff', 'rev1' => $rev->getRev(), 'rev2' => $diff]);
+            $icon = inlineSVG(__DIR__ . '/../ico/diff.svg');
+            $text .= ' <a href="' . $link . '" title="' . $this->getLang('diff') . '">' . $icon . '</a>';
+        }
+
+        return "<p class='$name'>$text</p>";
     }
 
     /**
