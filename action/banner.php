@@ -73,7 +73,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         if ($shownRevision->getRev() == $newestRevision->getRev()) {
             $banner .= $this->actionButtons(
                 $shownRevision->getStatus(),
-                $latestpubRevision ? $latestpubRevision->getVersion() : ''
+                $latestpubRevision ? $this->increaseVersion($latestpubRevision->getVersion()) : '1'
             );
         }
 
@@ -156,5 +156,24 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         }
 
         return $form->toHTML();
+    }
+
+    /**
+     * Tries to increase a given version
+     *
+     * @param string $version
+     * @return string
+     */
+    protected function increaseVersion($version)
+    {
+        $parts = explode('.', $version);
+        $last = array_pop($parts);
+
+        if (is_numeric($last)) {
+            $last++;
+        }
+        $parts[] = $last;
+
+        return join('.', $parts);
     }
 }
