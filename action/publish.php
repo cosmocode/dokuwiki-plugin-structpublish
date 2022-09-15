@@ -71,7 +71,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         }
         $revision->setUser($_SERVER['REMOTE_USER']);
         $revision->setStatus($status);
-        $revision->setDate(time());
+        $revision->setDatetime(time());
         $revision->save();
     }
 

@@ -73,15 +73,15 @@
             "ismulti": false,
             "isenabled": true,
             "sort": 30,
-            "label": "date",
-            "class": "Date",
+            "label": "datetime",
+            "class": "DateTime",
             "config": {
                 "visibility": {
                     "inpage": false,
                     "ineditor": false
                 },
-                "format": "Y-m-d",
-                "prefilltoday": true,
+                "format": "Y-m-d H:i",
+                "prefilltoday": false,
                 "pastonly": false,
                 "futureonly": false,
                 "label": {

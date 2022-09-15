@@ -51,10 +51,10 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $status = $revision->getStatus() ?: Constants::STATUS_DRAFT;
         if ($status === Constants::STATUS_PUBLISHED) {
             $publisher = userlink($revision->getUser(), true);
-            $publishDate = $revision->getDate();
+            $publishDate = $revision->getDatetime();
         } else {
             $publisher = userlink($revision->getLatestPublishedRevision()->getUser(), true);
-            $publishDate = $revision->getLatestPublishedRevision()->getDate();
+            $publishDate = $revision->getLatestPublishedRevision()->getDatetime();
         }
 
         $version =  '';

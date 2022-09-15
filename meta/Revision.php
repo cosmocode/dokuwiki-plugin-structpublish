@@ -20,14 +20,14 @@ class Revision
     protected $status;
     protected $version;
     protected $user;
-    protected $date;
+    protected $datetime;
     /**
      * @var bool|\dokuwiki\plugin\struct\meta\Column
      */
     protected $statusCol;
     protected $versionCol;
     protected $userCol;
-    protected $dateCol;
+    protected $datetimeCol;
     protected $revisionCol;
 
     /**
@@ -41,12 +41,13 @@ class Revision
         $this->id = $id;
         $this->rev = $rev;
         $this->published = 0;
+        $this->status = Constants::STATUS_DRAFT;
 
         $this->schema = new Schema('structpublish');
         $this->statusCol = $this->schema->findColumn('status');
         $this->versionCol = $this->schema->findColumn('version');
         $this->userCol = $this->schema->findColumn('user');
-        $this->dateCol = $this->schema->findColumn('date');
+        $this->datetimeCol = $this->schema->findColumn('datetime');
         $this->revisionCol = $this->schema->findColumn('revision');
 
         /** @var Value[] $values */
@@ -56,7 +57,7 @@ class Revision
             $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
             $this->version = $values[$this->versionCol->getColref() - 1]->getRawValue();
             $this->user = $values[$this->userCol->getColref() - 1]->getRawValue();
-            $this->date = $values[$this->dateCol->getColref() - 1]->getRawValue();
+            $this->datetime = $values[$this->datetimeCol->getColref() - 1]->getRawValue();
         }
     }
 
@@ -135,14 +136,14 @@ class Revision
         $this->user = $user;
     }
 
-    public function getDate()
+    public function getDatetime()
     {
-        return $this->date;
+        return $this->datetime;
     }
 
-    public function setDate($time)
+    public function setDatetime($time)
     {
-        $this->date = date('Y-m-d', $time);
+        $this->datetime = date('Y-m-d H:i', $time);
     }
 
     /**
@@ -153,7 +154,7 @@ class Revision
         $data = [
             'status' => $this->status,
             'user' => $this->user,
-            'date' => $this->date,
+            'date' => $this->datetime,
             'revision' => $this->rev,
             'version' => $this->version,
         ];
@@ -209,7 +210,7 @@ class Revision
 
         $published->setStatus($latestPublished[$this->statusCol->getColref() - 1]->getRawValue());
         $published->setUser($latestPublished[$this->userCol->getColref() - 1]->getRawValue());
-        $published->setDate($latestPublished[$this->dateCol->getColref() - 1]->getRawValue());
+        $published->setDatetime($latestPublished[$this->datetimeCol->getColref() - 1]->getRawValue());
         $published->setVersion($latestPublished[$this->versionCol->getColref() - 1]->getRawValue());
 
         return $published;
