@@ -282,4 +282,12 @@ class Assignments
 
         return $result;
     }
+
+    /**
+     * @return \helper_plugin_sqlite|null
+     */
+    public function getSqlite()
+    {
+        return $this->sqlite;
+    }
 }
