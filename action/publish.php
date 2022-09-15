@@ -72,7 +72,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         }
         $revision->setUser($_SERVER['REMOTE_USER']);
         $revision->setStatus($status);
-        $revision->setDatetime(time());
+        $revision->setTimestamp(time());
         $revision->save();
     }
 

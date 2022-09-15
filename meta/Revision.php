@@ -190,6 +190,14 @@ class Revision
     }
 
     /**
+     * Set the timestamp of when the status of this revision was changed
+     */
+    public function setTimestamp($timestamp)
+    {
+        $this->datetime = date('Y-m-d\TH:i', $timestamp);
+    }
+
+    /**
      * The page ID this revision is for
      * @return string
      */
