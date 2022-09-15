@@ -49,6 +49,7 @@ class Assignments
 
         $this->loadPatterns();
     }
+
     /**
      * Load existing assignment patterns
      */
@@ -72,7 +73,7 @@ class Assignments
     {
         // add the pattern
         $sql = 'REPLACE INTO structpublish_assignments_patterns (pattern, user, status) VALUES (?,?,?)';
-        $ok = (bool)$this->sqlite->query($sql, [$pattern, $user, $status]);
+        $ok = (bool) $this->sqlite->query($sql, [$pattern, $user, $status]);
 
         // reload patterns
         $this->loadPatterns();
@@ -102,7 +103,7 @@ class Assignments
     {
         // remove the pattern
         $sql = 'DELETE FROM structpublish_assignments_patterns WHERE pattern = ? AND user = ? AND status = ?';
-        $ok = (bool)$this->sqlite->query($sql, [$pattern, $user, $status]);
+        $ok = (bool) $this->sqlite->query($sql, [$pattern, $user, $status]);
 
         // reload patterns
         $this->loadPatterns();
@@ -159,14 +160,14 @@ class Assignments
     public function clear($full = false)
     {
         $sql = 'DELETE FROM structpublish_assignments_patterns';
-        $ok = (bool)$this->sqlite->query($sql);
+        $ok = (bool) $this->sqlite->query($sql);
 
         if ($full) {
             $sql = 'DELETE FROM structpublish_assignments';
         } else {
             $sql = 'UPDATE structpublish_assignments SET assigned = 0';
         }
-        $ok = $ok && (bool)$this->sqlite->query($sql);
+        $ok = $ok && (bool) $this->sqlite->query($sql);
 
         // reload patterns
         $this->loadPatterns();
@@ -185,7 +186,7 @@ class Assignments
     public function assignPage($page, $user = null, $status = null)
     {
         $sql = 'REPLACE INTO structpublish_assignments (pid, user, status, assigned) VALUES (?, ?, ?, 1)';
-        return (bool)$this->sqlite->query($sql, [$page, $user, $status]);
+        return (bool) $this->sqlite->query($sql, [$page, $user, $status]);
     }
 
     /**
@@ -198,7 +199,7 @@ class Assignments
     public function deassignPage($page, $user, $status)
     {
         $sql = 'REPLACE INTO structpublish_assignments (pid, user, status, assigned) VALUES (?, ?, ?, 0)';
-        return (bool)$this->sqlite->query($sql, [$page, $user, $status]);
+        return (bool) $this->sqlite->query($sql, [$page, $user, $status]);
     }
 
     /**
@@ -273,8 +274,10 @@ class Assignments
             $pid = $row['pid'];
             $user = $row['user'];
             $status = $row['status'];
-            if (!isset($result[$pid])) $result[$pid] = array();
-            $result[$pid][$user][$status] = (bool)$row['assigned'];
+            if (!isset($result[$pid])) {
+                $result[$pid] = array();
+            }
+            $result[$pid][$user][$status] = (bool) $row['assigned'];
         }
 
         return $result;

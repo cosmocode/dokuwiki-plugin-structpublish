@@ -12,9 +12,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /** @var \helper_plugin_structpublish_db */
     protected $dbHelper;
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'renderBanner');

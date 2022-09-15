@@ -8,15 +8,19 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     /** @var \helper_plugin_structpublish_db */
     protected $dbHelper;
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handleApprove');
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handlePublish');
     }
 
+    /**
+     * Handle the publish button and version field
+     *
+     * @param Doku_Event $event
+     * @return void
+     */
     public function handlePublish(Doku_Event $event)
     {
         if ($event->data != 'show') return;
@@ -35,6 +39,12 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         }
     }
 
+    /**
+     * Handle the approve button
+     *
+     * @param Doku_Event $event
+     * @return void
+     */
     public function handleApprove(Doku_Event $event)
     {
         if ($event->data != 'show') return;
@@ -55,6 +65,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     /**
      * Save publish data
      *
+     * @todo check user role
      * @param string $status
      * @return void
      */

@@ -5,17 +5,23 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 
 class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
 {
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handleShow');
     }
 
+    /**
+     * Decide which revision to show based on role assignments
+     *
+     * @param Doku_Event $event
+     * @return void
+     */
     public function handleShow(Doku_Event $event)
     {
-        if ($event->data != 'show') return;
+        if ($event->data != 'show') {
+            return;
+        }
 
         global $ID;
         global $REV;
@@ -24,7 +30,9 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         /** @var helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
-        if (!$dbHelper->isPublishable()) return;
+        if (!$dbHelper->isPublishable()) {
+            return;
+        }
 
         $currentRevision = new Revision($dbHelper->getDB(), $ID, $INFO['currentrev']);
         /** @var action_plugin_structpublish_sqlitefunction $functions */

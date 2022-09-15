@@ -9,7 +9,6 @@ use dokuwiki\plugin\structpublish\meta\Constants;
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Anna Dabrowska <dokuwiki@cosmocode.de>
  */
-
 class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
 {
     /**
@@ -38,28 +37,37 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
 
         try {
             $assignments = Assignments::getInstance();
-        } catch (Exception $e) {
+        } catch(Exception $e) {
             msg($e->getMessage(), -1);
-            return false;
+            return;
         }
 
         if ($INPUT->str('action') && $INPUT->arr('assignment') && checkSecurityToken()) {
             $assignment = $INPUT->arr('assignment');
             if (!blank($assignment['pattern']) && !blank($assignment['status'])) {
                 if ($INPUT->str('action') === 'delete') {
-                    $ok = $assignments->removePattern($assignment['pattern'], $assignment['user'], $assignment['status']);
-                    if (!$ok) msg('failed to remove pattern', -1);
+                    $ok = $assignments->removePattern($assignment['pattern'], $assignment['user'],
+                        $assignment['status']);
+                    if (!$ok) {
+                        msg('failed to remove pattern', -1);
+                    }
                 } elseif ($INPUT->str('action') === 'add') {
                     if ($assignment['pattern'][0] == '/') {
                         if (@preg_match($assignment['pattern'], null) === false) {
                             msg('Invalid regular expression. Pattern not saved', -1);
                         } else {
-                            $ok = $assignments->addPattern($assignment['pattern'], $assignment['user'], $assignment['status']);
-                            if (!$ok) msg('failed to add pattern', -1);
+                            $ok = $assignments->addPattern($assignment['pattern'], $assignment['user'],
+                                $assignment['status']);
+                            if (!$ok) {
+                                msg('failed to add pattern', -1);
+                            }
                         }
                     } else {
-                        $ok = $assignments->addPattern($assignment['pattern'],$assignment['user'], $assignment['status']);
-                        if (!$ok) msg('failed to add pattern', -1);
+                        $ok = $assignments->addPattern($assignment['pattern'], $assignment['user'],
+                            $assignment['status']);
+                        if (!$ok) {
+                            msg('failed to add pattern', -1);
+                        }
                     }
                 }
             }
@@ -69,7 +77,7 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
     }
 
     /**
-     * Render HTML output, e.g. helpful text and a form
+     * Render HTML output
      */
     public function html()
     {
@@ -79,9 +87,9 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
 
         try {
             $assignments = Assignments::getInstance();
-        } catch (Exception $e) {
+        } catch(Exception $e) {
             msg($e->getMessage(), -1);
-            return false;
+            return;
         }
         $list = $assignments->getAllPatterns();
 

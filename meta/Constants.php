@@ -7,7 +7,8 @@ namespace dokuwiki\plugin\structpublish\meta;
  *
  * @todo this might need to be replaced later if we want to have user configurable status
  */
-class Constants {
+class Constants
+{
     // a page can be in one current status
     const STATUS_DRAFT = 'draft';
     const STATUS_APPROVED = 'approved';

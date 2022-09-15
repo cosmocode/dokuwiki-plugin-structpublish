@@ -16,23 +16,16 @@ class AccessTableStructpublish extends AccessTableSerial
 {
     protected $published = 0;
 
-    public function __construct($table, $pid, $ts = 0, $rid = 0)
-    {
-        parent::__construct($table, $pid, $ts, $rid);
-    }
-
     /**
-     * @param int $published
+     * @param 0|1|bool $published
      * @return void
      */
     public function setPublished($published)
     {
-        $this->published = $published;
+        $this->published = (int) $published;
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     protected function getSingleSql()
     {
         $cols = array_merge($this->getSingleNoninputCols(), $this->singleCols);
@@ -44,31 +37,26 @@ class AccessTableStructpublish extends AccessTableSerial
                       VALUES ($rid," . trim(str_repeat('?,', count($vals)), ',') . ');';
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     protected function getMultiSql()
     {
         return '';
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     protected function getSingleNoninputCols()
     {
         return ['pid', 'rev', 'latest', 'published'];
     }
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     protected function getSingleNoninputValues()
     {
         return [$this->pid, AccessTable::DEFAULT_REV, AccessTable::DEFAULT_LATEST, $this->published];
     }
 
     /**
+     * @inheritdoc
      * @return int|bool
      */
     protected function getLastRevisionTimestamp()
@@ -87,7 +75,9 @@ class AccessTableStructpublish extends AccessTableSerial
         $ret = $this->sqlite->res2single($res);
         $this->sqlite->res_close($res);
         // make sure we don't cast empty result to 0 (serial data has rev = 0)
-        if ($ret !== false) $ret = (int)$ret;
+        if ($ret !== false) {
+            $ret = (int) $ret;
+        }
         return $ret;
     }
 }

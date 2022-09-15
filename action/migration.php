@@ -17,6 +17,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      *
      * @param Doku_Event $event
      * @return bool
+     * @throws Exception
      */
     public function handleMigrations(Doku_Event $event)
     {
@@ -30,28 +31,27 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         $sqlite = $helper->getDB();
 
-        $ok = true;
-
         list($dbVersionStruct, $dbVersionStructpublish) = $this->getDbVersions($sqlite);
 
         // check if struct has required version
         if ($dbVersionStruct < self::MIN_DB_STRUCT) {
-            throw new Exception('Plugins struct is outdated. Minimum required database version is ' . self::MIN_DB_STRUCT);
+            throw new Exception('Plugin struct is outdated. Minimum required database version is ' . self::MIN_DB_STRUCT);
         }
 
         // check whether we are already up-to-date
         $latestVersion = $this->getLatestVersion();
-        if (isset($dbVersionStructpublish) && (int)$dbVersionStructpublish >= $latestVersion) {
-            return $ok;
+        if (isset($dbVersionStructpublish) && (int) $dbVersionStructpublish >= $latestVersion) {
+            return true;
         }
 
         // check whether we have any pending migrations
         $pending = range($dbVersionStructpublish ?: 1, $latestVersion);
         if (empty($pending)) {
-            return $ok;
+            return true;
         }
 
         // execute the migrations
+        $ok = true;
         foreach ($pending as $version) {
             $call = 'migration' . $version;
             $ok = $ok && $this->$call($sqlite);
@@ -61,8 +61,10 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     }
 
     /**
-     * @param $sqlite
-     * @return array
+     * Read the current versions for struct and struct publish from the database
+     *
+     * @param helper_plugin_sqlite $sqlite
+     * @return array [structversion, structpublishversion]
      */
     protected function getDbVersions($sqlite)
     {
@@ -89,7 +91,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      */
     protected function getLatestVersion()
     {
-        return (int)trim(file_get_contents(DOKU_PLUGIN . 'structpublish/db/latest.version', false));
+        return (int) trim(file_get_contents(DOKU_PLUGIN . 'structpublish/db/latest.version', false));
     }
 
     /**
@@ -106,13 +108,13 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         array_unshift($sql, 'BEGIN TRANSACTION');
         array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')");
         array_push($sql, "COMMIT TRANSACTION");
-        $ok =  $sqlite->doTransaction($sql);
+        $ok = $sqlite->doTransaction($sql);
 
         if ($ok) {
             $file = DOKU_PLUGIN . 'structpublish/db/json/structpublish0001.struct.json';
             $schemaJson = file_get_contents($file);
             $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
-            $ok = (bool)$importer->build();
+            $ok = (bool) $importer->build();
         }
 
         return $ok;

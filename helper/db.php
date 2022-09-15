@@ -1,7 +1,5 @@
 <?php
 
-use dokuwiki\plugin\structpublish\meta\Assignments;
-
 class helper_plugin_structpublish_db extends helper_plugin_struct_db
 {
 

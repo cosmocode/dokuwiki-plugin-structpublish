@@ -5,14 +5,18 @@ use dokuwiki\plugin\structpublish\meta\Assignments;
 class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
 {
 
-    /**
-     * @inheritDoc
-     */
+    /** @inheritDoc */
     public function register(\Doku_Event_Handler $controller)
     {
         $controller->register_hook('STRUCT_PLUGIN_SQLITE_FUNCTION', 'BEFORE', $this, 'addFunctions');
     }
 
+    /**
+     * Register our own sqlite function
+     *
+     * @param Doku_Event $event
+     * @return void
+     */
     public function addFunctions(Doku_Event $event)
     {
         $event->data[] = [
@@ -21,6 +25,16 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
         ];
     }
 
+    /**
+     * Function registered in SQLite
+     *
+     * Params are read via function args
+     *
+     * @param string $pid The page id
+     * @param string $userId The user name
+     * @param string[] $groups A list of groups the user is member of
+     * @return bool
+     */
     public function IS_PUBLISHER()
     {
         global $USERINFO;
