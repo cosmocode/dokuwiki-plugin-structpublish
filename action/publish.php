@@ -29,10 +29,10 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
             return;
         }
 
-        $this->saveRevision(Constants::STATUS_PUBLISHED);
-
-        $this->updateSchemaData();
-
+        if(checkSecurityToken()) {
+            $this->saveRevision(Constants::STATUS_PUBLISHED, $INPUT->str('version'));
+            $this->updateSchemaData();
+        }
     }
 
     public function handleApprove(Doku_Event $event)
@@ -47,7 +47,9 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
             return;
         }
 
-        $this->saveRevision(Constants::STATUS_APPROVED);
+        if(checkSecurityToken()) {
+            $this->saveRevision(Constants::STATUS_APPROVED);
+        }
     }
 
     /**
@@ -56,7 +58,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
      * @param string $status
      * @return void
      */
-    protected function saveRevision($status)
+    protected function saveRevision($status, $newversion='')
     {
         global $ID;
         global $INFO;
@@ -65,9 +67,8 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         $sqlite = $this->dbHelper->getDB();
         $revision = new Revision($sqlite, $ID, $INFO['currentrev']);
 
-        // TODO do not autoincrement version, make it a string
         if ($status === Constants::STATUS_PUBLISHED) {
-            $revision->setVersion($revision->getVersion() + 1);
+            $revision->setVersion($newversion);
         }
         $revision->setUser($_SERVER['REMOTE_USER']);
         $revision->setStatus($status);

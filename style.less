@@ -1,17 +1,33 @@
 .plugin-structpublish-banner {
 
-    border: 1px solid @ini_border;
-    padding: 1rem;
-
-    &.banner-draft {
-        background-color: #e68e8e;
+    svg {
+        float: left;
+        width: 3rem;
+        height: 3rem;
+        padding-right: 1rem;
     }
 
-    &.banner-approved {
-        background-color: #eac279;
+    &.draft {
+        svg {
+            fill: #c33;
+        }
     }
 
-    &.banner-published {
-        background-color: palegreen;
+    &.approved {
+        svg {
+            fill: #cc3;
+        }
     }
+
+    &.published {
+        svg {
+            fill: #3c3;
+        }
+    }
+
+    form,
+    p {
+        margin-left: 4rem;
+    }
+
 }

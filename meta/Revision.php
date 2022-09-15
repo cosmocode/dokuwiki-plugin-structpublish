@@ -141,9 +141,19 @@ class Revision
         return $this->datetime;
     }
 
+    public function getTimestamp()
+    {
+        return strtotime($this->datetime);
+    }
+
     public function setDatetime($time)
     {
-        $this->datetime = date('Y-m-d H:i', $time);
+        $this->datetime = $time;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**
@@ -154,7 +164,7 @@ class Revision
         $data = [
             'status' => $this->status,
             'user' => $this->user,
-            'date' => $this->datetime,
+            'datetime' => $this->datetime,
             'revision' => $this->rev,
             'version' => $this->version,
         ];

@@ -34,7 +34,6 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
 
         $revision = new Revision($dbHelper->getDB(), $id, $event->data['newRevision']);
         $revision->setStatus(Constants::STATUS_DRAFT);
-        $revision->setVersion($revision->getLatestPublishedRevision()->getVersion());
 
         try {
             $revision->save();

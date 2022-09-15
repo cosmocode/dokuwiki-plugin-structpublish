@@ -29,84 +29,134 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         global $INFO;
         global $REV;
 
-        if ($event->data !== 'show') return;
+        if ($event->data !== 'show') {
+            return;
+        }
 
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
-        if (!$this->dbHelper->isPublishable()) return;
+        if (!$this->dbHelper->isPublishable()) {
+            return;
+        }
 
-        $revision = new Revision($this->dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
+        // get the possible revisions needed in the banner
+        $newestRevision = new Revision($this->dbHelper->getDB(), $ID, $INFO['currentrev']);
+        if ($REV) {
+            $shownRevision = new Revision($this->dbHelper->getDB(), $ID, $REV);
+        } else {
+            $shownRevision = $newestRevision;
+        }
+        $latestpubRevision = $newestRevision->getLatestPublishedRevision();
+        $prevpubRevision = $shownRevision->getLatestPublishedRevision();
 
-        echo $this->getBannerHtml($revision);
+        $banner = '<div class="plugin-structpublish-banner ' . $shownRevision->getStatus() . '">';
+
+        // status of the shown revision
+        $banner .= inlineSVG(__DIR__ . '/../ico/' . $shownRevision->getStatus() . '.svg');
+        $banner .= $this->getBannerText('status_' . $shownRevision->getStatus(), $shownRevision);
+
+        // link to previous or newest published version
+        if ($latestpubRevision !== null && $shownRevision->getRev() < $latestpubRevision->getRev()) {
+            $banner .= $this->getBannerText('latest_publish', $latestpubRevision);
+        } else {
+            $banner .= $this->getBannerText('previous_publish', $prevpubRevision);
+        }
+
+        // link to newest draft, if exists, is not shown already and user has a role
+        if (
+            $newestRevision->getRev() != $shownRevision->getRev() &&
+            $newestRevision->getStatus() != Constants::STATUS_PUBLISHED &&
+            $this->dbHelper->checkAccess($ID)
+        ) {
+            $banner .= $this->getBannerText('latest_draft', $newestRevision);
+        }
+
+        // action buttons
+        if ($shownRevision->getRev() == $newestRevision->getRev()) {
+            $banner .= $this->actionButtons(
+                $shownRevision->getStatus(),
+                $latestpubRevision ? $latestpubRevision->getVersion() : ''
+            );
+        }
+
+        $banner .= '</div>';
+        echo $banner;
     }
 
     /**
-     * @param Revision $revision latest publish data
+     * Fills place holder texts with data from the given Revision
+     *
+     * @param string $text
+     * @param Revision $rev
      * @return string
      */
-    protected function getBannerHtml($revision)
+    protected function getBannerText($text, $rev)
     {
-        global $ID;
-
-        $status = $revision->getStatus() ?: Constants::STATUS_DRAFT;
-        if ($status === Constants::STATUS_PUBLISHED) {
-            $publisher = userlink($revision->getUser(), true);
-            $publishDate = $revision->getDatetime();
-        } else {
-            $publisher = userlink($revision->getLatestPublishedRevision()->getUser(), true);
-            $publishDate = $revision->getLatestPublishedRevision()->getDatetime();
+        if ($rev === null) {
+            return '';
         }
 
-        $version =  '';
-        if ($revision->getVersion()) {
-            $version = $revision->getVersion() . " ($publishDate, $publisher)";
+        $replace = [
+            '{user}' => userlink($rev->getUser()),
+            '{revision}' => $this->makeLink($rev->getId(), $rev->getRev(), dformat($rev->getRev())),
+            '{datetime}' => $this->makeLink($rev->getId(), $rev->getRev(), dformat($rev->getTimestamp())),
+            '{version}' => hsc($rev->getVersion()),
+        ];
 
-            if ($status !== Constants::STATUS_PUBLISHED) {
-                $version = sprintf(
-                    '<a href="'. wl($ID, ['rev' => $revision->getLatestPublishedRevision()->getRev()]) . ' ">%s</a>',
-                    $version
-                );
-            }
-        }
+        $text = $this->getLang("banner_$text");
+        $text = strtr($text, $replace);
 
-        $actionForm = $this->formHtml($status);
-
-        $html = sprintf(
-            $this->getBannerTemplate(),
-            $status,
-            $status,
-            $version,
-            $actionForm
-        );
-
-        return $html;
+        return "<p>$text</p>";
     }
 
-    protected function formHtml($status)
+    /**
+     * Create a HTML link to a specific revision
+     *
+     * @param string $id page id
+     * @param int $rev revision to link to
+     * @param int $text the link text to use
+     * @return string
+     */
+    protected function makeLink($id, $rev, $text)
+    {
+        $url = wl($id, ['rev' => $rev]);
+        return '<a href="' . $url . '">' . hsc($text) . '</a>';
+    }
+
+    /**
+     * Create the form for approval and publishing
+     *
+     * @param string $status current status
+     * @param string $newVersion suggested new Version
+     * @return string
+     */
+    protected function actionButtons($status, $newVersion)
     {
         global $ID;
-        if ($status === Constants::STATUS_PUBLISHED) return '';
+        if ($status === Constants::STATUS_PUBLISHED) {
+            return '';
+        }
 
         $form = new dokuwiki\Form\Form();
 
-        if ($status !== Constants::STATUS_APPROVED) {
-            $form->addButton('structpublish[approve]', 'APPROVE')->attr('type', 'submit');
+        if (
+            $status !== Constants::STATUS_APPROVED &&
+            $this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
+        ) {
+            $form->addButton(
+                'structpublish[approve]',
+                $this->getLang('action_' . Constants::ACTION_APPROVE)
+            )->attr('type', 'submit');
         }
 
-
-        $form->addButton('structpublish[publish]', 'PUBLISH')->attr('type', 'submit');
+        if ($this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
+            $form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
+            $form->addButton(
+                'structpublish[publish]',
+                $this->getLang('action_' . Constants::ACTION_PUBLISH)
+            )->attr('type', 'submit');
+        }
 
         return $form->toHTML();
-    }
-
-    protected function getBannerTemplate()
-    {
-        $template = '<div class="plugin-structpublish-banner banner-%s">';
-        $template .= '<div class="plugin-structpublish-status">' . $this->getLang('status') . ': %s</div>';
-        $template .= '<div class="plugin-structpublish-version">' . $this->getLang('version') . ': %s</div>';
-        $template .= '<div class="plugin-structpublish-actions">%s</div>';
-        $template .= '</div>';
-
-        return $template;
     }
 }
