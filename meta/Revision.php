@@ -7,6 +7,9 @@ use dokuwiki\plugin\struct\meta\Schema;
 use dokuwiki\plugin\struct\meta\SearchConfig;
 use dokuwiki\plugin\struct\meta\Value;
 
+/**
+ * Object representing a page revision and its properties
+ */
 class Revision
 {
     /** @var \helper_plugin_sqlite */
@@ -21,9 +24,7 @@ class Revision
     protected $version;
     protected $user;
     protected $datetime;
-    /**
-     * @var bool|\dokuwiki\plugin\struct\meta\Column
-     */
+    /** @var bool|\dokuwiki\plugin\struct\meta\Column */
     protected $statusCol;
     protected $versionCol;
     protected $userCol;
@@ -31,9 +32,11 @@ class Revision
     protected $revisionCol;
 
     /**
-     * @param $sqlite
-     * @param string $id
-     * @param int $rev
+     * Constructor
+     *
+     * @param \helper_plugin_sqlite $sqlite
+     * @param string $id page id
+     * @param int $rev revision
      */
     public function __construct($sqlite, $id, $rev)
     {
@@ -61,6 +64,10 @@ class Revision
         }
     }
 
+    /**
+     * Store the currently set structpublish meta data in the database
+     * @return void
+     */
     public function save()
     {
         if ($this->status === Constants::STATUS_PUBLISHED) {
@@ -69,26 +76,31 @@ class Revision
 
         $this->updateCoreData($this->id);
         // TODO reset publish status of older revisions
-
     }
 
     /**
-     * @return int
+     * Return the version of a published revision
+     *
+     * @return string|null
      */
     public function getVersion()
     {
-        return (int)$this->version;
+        return $this->version;
     }
 
     /**
-     * @param int $version
+     * Set the version of a published revision
+     *
+     * @param string $version
      */
-    public function setVersion($version): void
+    public function setVersion($version)
     {
         $this->version = $version;
     }
 
     /**
+     * The revision timestamp
+     *
      * @return int
      */
     public function getRev()
@@ -97,14 +109,8 @@ class Revision
     }
 
     /**
-     * @param int $rev
-     */
-    public function setRev($rev): void
-    {
-        $this->rev = $rev;
-    }
-
-    /**
+     * Get the current status of this revision
+     *
      * @return string
      */
     public function getStatus()
@@ -113,15 +119,21 @@ class Revision
     }
 
     /**
+     * Set the current status of this revision
+     *
      * @param string $status
      */
-    public function setStatus($status): void
+    public function setStatus($status)
     {
         $this->status = $status;
     }
 
     /**
-     * @return string
+     * Get the user that changed the status of this revision
+     *
+     * Not available for drafts
+     *
+     * @return string|null
      */
     public function getUser()
     {
@@ -129,6 +141,8 @@ class Revision
     }
 
     /**
+     * Set the user that changed the revision status
+     *
      * @param string $user
      */
     public function setUser($user): void
@@ -136,21 +150,49 @@ class Revision
         $this->user = $user;
     }
 
+    /**
+     * The datetime when the status of this revision was changed
+     *
+     * Uses ISO Format. Not available for drafts
+     *
+     * @return string|null
+     */
     public function getDatetime()
     {
         return $this->datetime;
     }
 
+    /**
+     * The timestamp of when the status of this revision was changed
+     *
+     * Not available for drafts
+     *
+     * @return int|null
+     */
     public function getTimestamp()
     {
+        if ($this->datetime === null) {
+            return null;
+        }
         return strtotime($this->datetime);
     }
 
+    /**
+     * Set the datetime when the status of this revision was changed
+     *
+     * Uses ISO Format
+     *
+     * @param string $time
+     */
     public function setDatetime($time)
     {
         $this->datetime = $time;
     }
 
+    /**
+     * The page ID this revision is for
+     * @return string
+     */
     public function getId()
     {
         return $this->id;
@@ -158,6 +200,9 @@ class Revision
 
     /**
      * Update publish status in the core table
+     *
+     * @param string $pid
+     * @param int $rid
      */
     protected function updateCoreData($pid, $rid = 0)
     {
@@ -174,6 +219,11 @@ class Revision
         $access->saveData($data);
     }
 
+    /**
+     * @param string $andFilter
+     * @return array|Value[]
+     * @fixme fix fixme, update doc block
+     */
     public function getCoreData($andFilter = '')
     {
         $lines = [
@@ -216,7 +266,8 @@ class Revision
             return null;
         }
 
-        $published = new Revision($this->sqlite, $this->id, $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue());
+        $published = new Revision($this->sqlite, $this->id,
+            $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue());
 
         $published->setStatus($latestPublished[$this->statusCol->getColref() - 1]->getRawValue());
         $published->setUser($latestPublished[$this->userCol->getColref() - 1]->getRawValue());
