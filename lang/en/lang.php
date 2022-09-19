@@ -22,7 +22,7 @@ $lang['action_publish'] = 'Publish';
 $lang['diff'] = 'Show differences';
 $lang['banner_status_draft'] = 'This page revision is a <strong>working draft</strong>, created on {revision}.';
 $lang['banner_status_approved'] = 'This page revision has been <strong>approved for publishing</strong> on {datetime} by {user}.';
-$lang['banner_status_published'] = 'This page revision has been <strong>published as version "{version}"</strong> on {datetime} by {user}.';
+$lang['banner_status_published'] = 'This page revision has been <strong>published <span class="plugin-structpublish-version">as version "{version}"</span></strong> on {datetime} by {user}.';
 $lang['banner_latest_publish'] = 'The page was most recently published as version {version} by {user} on {datetime}.';
 $lang['banner_previous_publish'] = 'The page was previously published as version {version} by {user} on {datetime}.';
 $lang['banner_latest_draft'] = 'A newer working draft created on {revision} exists.';

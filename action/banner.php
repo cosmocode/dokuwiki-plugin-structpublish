@@ -100,7 +100,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             '{user}' => userlink($rev->getUser()),
             '{revision}' => $this->makeLink($rev->getId(), $rev->getRev(), dformat($rev->getRev())),
             '{datetime}' => $this->makeLink($rev->getId(), $rev->getRev(), dformat($rev->getTimestamp())),
-            '{version}' => '<span class="plugin-structpublish-version">' . hsc($rev->getVersion()) . '</span>',
+            '{version}' => hsc($rev->getVersion()),
         ];
 
         $text = $this->getLang("banner_$name");
