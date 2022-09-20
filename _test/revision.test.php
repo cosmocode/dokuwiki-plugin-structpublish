@@ -1,12 +1,13 @@
 <?php
 
+use dokuwiki\plugin\structpublish\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
 /**
  * Revision tests for the structpublish plugin
  *
- * @group plugin_structpublishh
+ * @group plugin_structpublish
  * @group plugins
  */
 class revision_plugin_structpublish_test extends DokuWikiTest
@@ -27,7 +28,7 @@ class revision_plugin_structpublish_test extends DokuWikiTest
 
         // user
         $_SERVER['REMOTE_USER'] = 'publisher';
-        $USERINFO['grps'] = ['user, approver, publisher'];
+        $USERINFO['grps'] = ['user', 'approver', 'publisher'];
 
         // our database migrations
         /** @var action_plugin_structpublish_migration $migration */
@@ -36,24 +37,34 @@ class revision_plugin_structpublish_test extends DokuWikiTest
         $migration->handleMigrations(new Doku_Event('DUMMY_EVENT', $data));
 
         // assignments
-        $assignments = \dokuwiki\plugin\structpublish\meta\Assignments::getInstance(true);
+        $assignments = Assignments::getInstance(true);
         $this->sqlite = $assignments->getSqlite();
-        $assignments->addPattern('public', '@approver', 'approve');
-        $assignments->addPattern('public', '@publisher', 'publish');
+        $assignments->addPattern('public:**', '@approver', 'approve');
+        $assignments->addPattern('public:**', '@publisher', 'publish');
     }
 
     /**
-     * Test draft creation
+     * Test publish workflow
      *
      * @return void
      */
-    public function test_create_draft()
+    public function test_full_workflow()
     {
+        global $ID;
+        global $INFO;
+
         $pid = 'public:structpublish';
+        $ID = $pid;
+        $INFO['id'] = $pid;
+
         $text = 'lorem ipsum';
+
         saveWikiText($pid, $text, 'Save first draft');
 
-        $revision = new Revision($this->sqlite, $pid, time());
+        $currentrev = time();
+        $INFO['currentrev'] = $currentrev;
+
+        $revision = new Revision($this->sqlite, $pid, $currentrev);
 
         $user = $revision->getUser();
         $status = $revision->getStatus();
@@ -62,5 +73,23 @@ class revision_plugin_structpublish_test extends DokuWikiTest
         $this->assertEquals('', $user);
         $this->assertEquals(Constants::STATUS_DRAFT, $status);
         $this->assertEquals('', $version);
+
+        $helper = plugin_load('helper', 'structpublish_publish');
+
+        // approve
+        $helper->saveRevision(Constants::ACTION_APPROVE, $currentrev);
+
+        $revision = new Revision($this->sqlite, $ID, $currentrev);
+        $status = $revision->getStatus();
+        $this->assertEquals(Constants::STATUS_APPROVED, $status);
+
+        // publish
+        $helper->saveRevision(Constants::ACTION_PUBLISH, $currentrev);
+
+        $revision = new Revision($this->sqlite, $ID, $currentrev);
+        $status = $revision->getStatus();
+        $user = $revision->getUser();
+        $this->assertEquals(Constants::STATUS_PUBLISHED, $status);
+        $this->assertEquals('publisher', $user);
     }
 }
