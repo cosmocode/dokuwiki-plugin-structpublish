@@ -45,7 +45,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $shownRevision = $newestRevision;
         }
         $latestpubRevision = $newestRevision->getLatestPublishedRevision();
-        $prevpubRevision = $shownRevision->getLatestPublishedRevision();
+        $prevpubRevision = $shownRevision->getLatestPublishedRevision($REV ?:  $INFO['currentrev']);
 
         $banner = '<div class="plugin-structpublish-banner ' . $shownRevision->getStatus() . '">';
 

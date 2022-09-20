@@ -54,7 +54,7 @@ class Revision
         $this->revisionCol = $this->schema->findColumn('revision');
 
         /** @var Value[] $values */
-        $values = $this->getCoreData('revision=' . $this->rev);
+        $values = $this->getCoreData(['revision=' . $this->rev]);
 
         if (!empty($values)) {
             $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
@@ -228,28 +228,33 @@ class Revision
     }
 
     /**
-     * @param string $andFilter
+     * Fetches data from the structpublish schema for the current page.
+     * Returns an array of struct Value objects, not literal values.
+     * $andFilters can be used to limit the search, e.g. by status or revision
+     * @see https://www.dokuwiki.org/plugin:struct:filters
+     *
+     * @param array $andFilters
      * @return array|Value[]
-     * @fixme fix fixme, update doc block
      */
-    public function getCoreData($andFilter = '')
+    public function getCoreData($andFilters = [])
     {
         $lines = [
             'schema: structpublish',
             'cols: *',
+            'sort: revision',
             'filter: %pageid% = $ID$'
         ];
 
-        if ($andFilter) {
-            $lines[] = 'filter: ' . $andFilter;
+        if (!empty($andFilters)) {
+            foreach ($andFilters as $filter)
+            $lines[] = 'filter: ' . $filter;
         }
 
         $parser = new ConfigParser($lines);
         $config = $parser->getConfig();
-        $search = new SearchConfig($config, $this->sqlite);
+        $search = new SearchConfig($config);
         $data = $search->execute();
         if (!empty($data)) {
-            // FIXME
             return $data[array_key_last($data)];
         }
         return [];
@@ -264,11 +269,11 @@ class Revision
      */
     public function getLatestPublishedRevision($rev = null)
     {
-        $andFilter = 'status=' . Constants::STATUS_PUBLISHED;
+        $andFilters[] = 'status=' . Constants::STATUS_PUBLISHED;
         if ($rev) {
-            $andFilter .= ' AND revision < ' . $rev;
+            $andFilters[] .= 'revision<' . $rev;
         }
-        $latestPublished = $this->getCoreData($andFilter);
+        $latestPublished = $this->getCoreData($andFilters);
 
         if (empty($latestPublished)) {
             return null;
