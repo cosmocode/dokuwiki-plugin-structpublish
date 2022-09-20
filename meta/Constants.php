@@ -14,7 +14,24 @@ class Constants
     const STATUS_APPROVED = 'approved';
     const STATUS_PUBLISHED = 'published';
 
-    // an action transforms a page from one status to another
+    // an action transitions a page from one status to another
     const ACTION_APPROVE = 'approve';
     const ACTION_PUBLISH = 'publish';
+
+
+    /**
+     * Convenience function mapping transition actions to resulting status
+     *
+     * @param string $action
+     * @return string
+     */
+    public static function transitionBy($action)
+    {
+        $map = [
+            self::ACTION_APPROVE => self::STATUS_APPROVED,
+            self::ACTION_PUBLISH => self::STATUS_PUBLISHED,
+        ];
+
+        return $map[$action];
+    }
 }

@@ -151,7 +151,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
         ) {
             $form->addButton(
-                'structpublish[approve]',
+                'structpublish[' . Constants::ACTION_APPROVE . ']',
                 $this->getLang('action_' . Constants::ACTION_APPROVE)
             )->attr('type', 'submit');
         }
@@ -159,7 +159,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         if ($this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
             $form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
             $form->addButton(
-                'structpublish[publish]',
+                'structpublish[' . Constants::ACTION_PUBLISH . ']',
                 $this->getLang('action_' . Constants::ACTION_PUBLISH)
             )->attr('type', 'submit');
         }
