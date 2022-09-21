@@ -5,7 +5,7 @@
     "user": "admin",
     "config": {
         "allowed editors": "NONE",
-        "noedit": true,
+        "internal": true,
         "label": {
             "de": "",
             "en": "",
