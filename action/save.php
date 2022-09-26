@@ -1,7 +1,6 @@
 <?php
 
 use dokuwiki\plugin\struct\meta\StructException;
-use dokuwiki\plugin\structpublish\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
@@ -27,12 +26,7 @@ class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
         /** @var helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
-        // FIXME evaluate changeType?
         $id = $event->data['id'];
-
-        // before checking for isPublishable() we have to update assignments @todo is that true?
-        $assignments = Assignments::getInstance();
-        $assignments->updatePageAssignments($id, true);
 
         if (!$dbHelper->isPublishable()) {
             return;
