@@ -75,7 +75,6 @@ class Revision
         }
 
         $this->updateCoreData($this->id);
-        // TODO reset publish status of older revisions
     }
 
     /**

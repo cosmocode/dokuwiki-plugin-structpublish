@@ -146,7 +146,7 @@ class Assignments
             }
         }
 
-        // FIXME reevalute existing assignments
+        // FIXME reevalute existing assignments for exclusion
     }
 
     /**

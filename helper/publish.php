@@ -75,7 +75,11 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
         $sqlite = $this->dbHelper->getDB();
 
         foreach ($tables as $table) {
-            // TODO unpublish earlier revisions
+            // unpublish earlier revisions
+            $sqlite->query("UPDATE data_$table SET published = 0 WHERE pid = ?", [$ID]);
+            $sqlite->query("UPDATE multi_$table SET published = 0 WHERE pid = ?", [$ID]);
+
+            // publish the current revision
             $sqlite->query("UPDATE data_$table SET published = 1 WHERE pid = ? AND rev = ?",
                 [$ID, $INFO['currentrev']]);
             $sqlite->query("UPDATE multi_$table SET published = 1 WHERE pid = ? AND rev = ?",
