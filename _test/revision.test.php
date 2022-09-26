@@ -77,19 +77,33 @@ class revision_plugin_structpublish_test extends DokuWikiTest
         $helper = plugin_load('helper', 'structpublish_publish');
 
         // approve
-        $helper->saveRevision(Constants::ACTION_APPROVE, $currentrev);
+        $helper->saveRevision(Constants::ACTION_APPROVE);
 
         $revision = new Revision($this->sqlite, $ID, $currentrev);
         $status = $revision->getStatus();
         $this->assertEquals(Constants::STATUS_APPROVED, $status);
 
         // publish
-        $helper->saveRevision(Constants::ACTION_PUBLISH, $currentrev);
+        $helper->saveRevision(Constants::ACTION_PUBLISH, '1');
 
         $revision = new Revision($this->sqlite, $ID, $currentrev);
         $status = $revision->getStatus();
         $user = $revision->getUser();
         $this->assertEquals(Constants::STATUS_PUBLISHED, $status);
         $this->assertEquals('publisher', $user);
+
+        sleep(3);
+
+        saveWikiText($pid, "$text $text", 'Save second draft');
+
+        $currentrev = time();
+        $INFO['currentrev'] = $currentrev;
+
+        $helper->saveRevision(Constants::ACTION_PUBLISH, '2');
+
+        $revision = new Revision($this->sqlite, $ID, $currentrev);
+        $previous = $revision->getLatestPublishedRevision($currentrev);
+        $this->assertEquals('2', $revision->getVersion());
+        $this->assertEquals('1', $previous->getVersion());
     }
 }
