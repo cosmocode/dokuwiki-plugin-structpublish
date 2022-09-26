@@ -34,7 +34,8 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
             return;
         }
 
-        $currentRevision = new Revision($dbHelper->getDB(), $ID, $INFO['currentrev']);
+        $currentRevision = new Revision($dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
+
         /** @var action_plugin_structpublish_sqlitefunction $functions */
         $functions = plugin_load('action', 'structpublish_sqlitefunction');
         if (
