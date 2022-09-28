@@ -37,6 +37,10 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
      */
     public function IS_PUBLISHER()
     {
+        /** @var helper_plugin_structpublish_db $helper */
+        $helper = plugin_load('helper', 'structpublish_db');
+        if (!$helper->isPublishable()) return 1;
+
         global $USERINFO;
         global $INPUT;
 
