@@ -1,0 +1,3 @@
+# we need additional plugin(s) for testing
+https://github.com/cosmocode/sqlite.git                         lib/plugins/sqlite
+https://github.com/cosmocode/dokuwiki-plugin-struct.git         lib/plugins/struct
