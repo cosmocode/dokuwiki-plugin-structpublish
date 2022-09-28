@@ -33,7 +33,7 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
      * @param string $pid The page id
      * @param string $userId The user name
      * @param string[] $groups A list of groups the user is member of
-     * @return bool
+     * @return int Return an integer instead of boolean for better sqlite compatibility
      */
     public function IS_PUBLISHER()
     {
@@ -45,7 +45,7 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
         $userId = $args[1] ?? $INPUT->server->str('REMOTE_USER');
         $grps = $args[2] ?? ($USERINFO['grps'] ?? []);
 
-        return $this->userHasRole(
+        return (int)$this->userHasRole(
             $pid,
             $userId,
             $grps
@@ -94,5 +94,4 @@ class action_plugin_structpublish_sqlitefunction extends DokuWiki_Action_Plugin
 
         return false;
     }
-
 }

@@ -27,9 +27,9 @@ class general_plugin_structpublish_test extends DokuWikiTest
         $this->assertArrayHasKey('url', $info);
 
         $this->assertEquals('structpublish', $info['base']);
-        $this->assertMatchesRegularExpression('/^https?:\/\//', $info['url']);
+        $this->assertRegExp('/^https?:\/\//', $info['url']);
         $this->assertTrue(mail_isvalid($info['email']));
-        $this->assertMatchesRegularExpression('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
+        $this->assertRegExp('/^\d\d\d\d-\d\d-\d\d$/', $info['date']);
         $this->assertTrue(false !== strtotime($info['date']));
     }
 
