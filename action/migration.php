@@ -102,19 +102,19 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      */
     protected function migration1($sqlite)
     {
-        $sql = io_readFile(DOKU_PLUGIN . 'structpublish/db/update0001.sql', false);
-
-        $sql = $sqlite->SQLstring2array($sql);
-        array_unshift($sql, 'BEGIN TRANSACTION');
-        array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')");
-        array_push($sql, "COMMIT TRANSACTION");
-        $ok = $sqlite->doTransaction($sql);
+        $file = DOKU_PLUGIN . 'structpublish/db/json/structpublish0001.struct.json';
+        $schemaJson = file_get_contents($file);
+        $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
+        $ok = (bool) $importer->build();
 
         if ($ok) {
-            $file = DOKU_PLUGIN . 'structpublish/db/json/structpublish0001.struct.json';
-            $schemaJson = file_get_contents($file);
-            $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
-            $ok = (bool) $importer->build();
+            $sql = io_readFile(DOKU_PLUGIN . 'structpublish/db/update0001.sql', false);
+
+            $sql = $sqlite->SQLstring2array($sql);
+            array_unshift($sql, 'BEGIN TRANSACTION');
+            array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')");
+            array_push($sql, "COMMIT TRANSACTION");
+            $ok = $sqlite->doTransaction($sql);
         }
 
         return $ok;
