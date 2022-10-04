@@ -7,7 +7,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 /**
  * Action component to handle page save
  */
-class action_plugin_structpublish_revision extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_save extends DokuWiki_Action_Plugin
 {
     /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
