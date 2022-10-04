@@ -254,7 +254,7 @@ class Revision
         $search = new SearchConfig($config);
         $data = $search->execute();
         if (!empty($data)) {
-            return $data[array_key_last($data)];
+            return array_pop($data);
         }
         return [];
     }
