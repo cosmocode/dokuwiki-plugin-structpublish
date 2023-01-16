@@ -84,8 +84,16 @@ class Assignments
         $dbHelper = plugin_load('helper', 'structpublish_db');
         $pids = $dbHelper->getPages();
 
+        // wrap in transaction
+        $this->sqlite->query('BEGIN TRANSACTION');
+
         foreach ($pids as $pid) {
             $this->updatePageAssignments($pid);
+        }
+
+        $ok = $ok && $this->sqlite->query('COMMIT TRANSACTION');
+        if (!$ok) {
+            $this->sqlite->query('ROLLBACK TRANSACTION');
         }
 
         return $ok;
