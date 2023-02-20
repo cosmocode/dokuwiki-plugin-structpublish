@@ -30,7 +30,10 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         /** @var helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
-        if (!$dbHelper->isPublishable()) {
+        if (
+            !$dbHelper->isPublishable() ||
+            (auth_isadmin() && !$this->getConf('restrict_admin'))
+        ) {
             return;
         }
 

@@ -5,4 +5,4 @@
  * @author Anna Dabrowska <dokuwiki@cosmocode.de>
  */
 
-$conf['fixme']    = 'FIXME';
+$conf['restrict_admin'] = 1;

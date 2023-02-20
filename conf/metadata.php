@@ -5,4 +5,4 @@
  * @author Anna Dabrowska <dokuwiki@cosmocode.de>
  */
 
-$meta['fixme'] = array('string');
+$meta['restrict_admin'] = ['onoff'];
