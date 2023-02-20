@@ -1,6 +1,7 @@
 <?php
 
 use dokuwiki\plugin\struct\meta\StructException;
+use dokuwiki\plugin\structpublish\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
@@ -27,6 +28,9 @@ class action_plugin_structpublish_save extends DokuWiki_Action_Plugin
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
         $id = $event->data['id'];
+
+        $assignments = Assignments::getInstance();
+        $assignments->updatePageAssignments($id);
 
         if (!$dbHelper->isPublishable()) {
             return;
