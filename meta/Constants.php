@@ -34,4 +34,26 @@ class Constants
 
         return $map[$action];
     }
+
+    public static function workflowSteps($action)
+    {
+        $map = [
+            self::ACTION_APPROVE => [
+                'fromStatus' => self::STATUS_DRAFT,
+                'currentStatus' => self::STATUS_APPROVED,
+                'toStatus' => self::STATUS_PUBLISHED,
+                'previousAction' => null,
+                'nextAction' => self::ACTION_PUBLISH
+            ],
+            self::ACTION_PUBLISH => [
+                'fromStatus' => self::STATUS_APPROVED,
+                'currentStatus' => self::STATUS_PUBLISHED,
+                'toStatus' => null,
+                'previousAction' => self::ACTION_APPROVE,
+                'nextAction' => null
+            ],
+        ];
+
+        return $map[$action];
+    }
 }

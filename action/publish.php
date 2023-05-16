@@ -15,6 +15,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
      *
      * @param Doku_Event $event
      * @return void
+     * @throws Exception
      */
     public function changeStatus(Doku_Event $event)
     {
@@ -23,14 +24,21 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
         }
 
         global $INPUT;
+
         $in = $INPUT->arr('structpublish');
-        if (!$in || !in_array(key($in), [Constants::ACTION_PUBLISH, Constants::ACTION_APPROVE])) {
+        $action = key($in);
+        if (!$action || !in_array($action, [Constants::ACTION_PUBLISH, Constants::ACTION_APPROVE])) {
             return;
         }
 
         if (!checkSecurityToken()) return;
 
+        /** @var helper_plugin_structpublish_publish $helper */
         $helper = plugin_load('helper', 'structpublish_publish');
-        $helper->saveRevision(key($in), $INPUT->str('version'));
+        $newRevision = $helper->saveRevision(key($in), $INPUT->str('version'));
+
+        /** @var helper_plugin_structpublish_notify $notifyHelper */
+        $notifyHelper  = plugin_load('helper', 'structpublish_notify');
+        $notifyHelper->sendEmails($action, $newRevision);
     }
 }

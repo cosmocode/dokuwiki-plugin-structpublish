@@ -34,3 +34,6 @@ $lang['assign_status'] = 'Status';
 $lang['assign_add'] = 'Add assignment';
 $lang['assign_del'] = 'Remove assignment';
 
+// email
+$lang['email_subject'] = 'Publish status of a wiki page has changed';
+$lang['email_error_norecipients'] = 'No recipients found to notify!';
