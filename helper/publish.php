@@ -25,7 +25,7 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
      * Save publish data
      *
      * @param string $action
-     * @return void
+     * @return Revision
      * @throws Exception
      */
     public function saveRevision($action, $newversion = '')
@@ -53,6 +53,8 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
         if ($action === Constants::ACTION_PUBLISH) {
             $this->updateSchemaData();
         }
+
+        return $revision;
     }
 
     /**

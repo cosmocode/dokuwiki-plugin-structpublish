@@ -5,10 +5,14 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 
 class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
 {
+    /** @var int */
+    static protected $latestPublishedRev;
+
     /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handleShow');
+        $controller->register_hook('HTML_SHOWREV_OUTPUT', 'BEFORE', $this, 'handleShowrev');
     }
 
     /**
@@ -38,23 +42,52 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         }
 
         $currentRevision = new Revision($dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
+        $isPublished = $currentRevision->getStatus() === Constants::STATUS_PUBLISHED;
 
         /** @var action_plugin_structpublish_sqlitefunction $functions */
         $functions = plugin_load('action', 'structpublish_sqlitefunction');
-        if (
-            $currentRevision->getStatus() !== Constants::STATUS_PUBLISHED
-            && !$functions->IS_PUBLISHER($ID)
-        ) {
+        if (!$functions->IS_PUBLISHER($ID)) {
             $latestPublished = $currentRevision->getLatestPublishedRevision();
-            if (is_null($latestPublished)) {
+            // there is no published revision, show nothing
+            if (!$isPublished && is_null($latestPublished)) {
                 $event->data = 'denied';
                 // FIXME we could add our own action to display a custom message instead of standard denied action
                 return;
             }
 
-            $latestPublishedRev = $latestPublished->getRev();
-            $REV = $latestPublishedRev;
-            $INFO['rev'] = $latestPublishedRev;
+            self::$latestPublishedRev = $latestPublished->getRev();
+
+            // show either the explicitly requested or the latest published revision
+            if (!$isPublished) {
+                $REV = self::$latestPublishedRev;
+                $INFO['rev'] = self::$latestPublishedRev;
+            }
+        }
+    }
+
+    /**
+     * Suppress message about viewing an old revision if it is the latest one
+     * that the current user is allowed to see.
+     *
+     * @param Doku_Event $event
+     * @return void
+     */
+    public function handleShowrev(Doku_Event $event)
+    {
+        /** @var helper_plugin_structpublish_db $dbHelper */
+        $dbHelper = plugin_load('helper', 'structpublish_db');
+
+        if (
+            !$dbHelper->isPublishable() ||
+            (auth_isadmin() && !$this->getConf('restrict_admin'))
+        ) {
+            return;
+        }
+
+        global $INFO;
+
+        if (self::$latestPublishedRev && self::$latestPublishedRev == $INFO['rev']) {
+            $event->preventDefault();
         }
     }
 }

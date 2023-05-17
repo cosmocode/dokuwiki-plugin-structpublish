@@ -1,9 +1,12 @@
 .plugin-structpublish-banner {
 
     border: 1px solid @ini_background_alt;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
     background-color: @ini_background_alt;
+
+    &:not(.compact) {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
 
     .icon svg {
         float: left;
@@ -40,6 +43,26 @@
         }
     }
 
+    &.compact {
+        padding: 0.2rem 0 0.2rem 0;
+
+        span.icon svg {
+            width: 2rem;
+            height: 1.5rem;
+        }
+
+        form {
+            float: right;
+
+            label {
+                margin-left: 1rem;
+            }
+
+            input {
+                width: 4rem;
+            }
+        }
+    }
 }
 
 .plugin-structpublish-version {
