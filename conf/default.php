@@ -8,3 +8,4 @@
 $conf['restrict_admin'] = 1;
 $conf['email_enable'] = 0;
 $conf['email_status'] = '';
+$conf['compact_view'] = 0;

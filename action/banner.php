@@ -12,6 +12,9 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /** @var \helper_plugin_structpublish_db */
     protected $dbHelper;
 
+    /** @var bool */
+    protected $compactView;
+
     /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)
     {
@@ -37,6 +40,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             return;
         }
 
+        $this->compactView = (bool)$this->getConf('compact_view');
+
         // get the possible revisions needed in the banner
         $newestRevision = new Revision($this->dbHelper->getDB(), $ID, $INFO['currentrev']);
         if ($REV) {
@@ -47,7 +52,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $latestpubRevision = $newestRevision->getLatestPublishedRevision();
         $prevpubRevision = $shownRevision->getLatestPublishedRevision($REV ?:  $INFO['currentrev']);
 
-        $banner = '<div class="plugin-structpublish-banner ' . $shownRevision->getStatus() . '">';
+        $compactClass = $this->compactView ? ' compact' : '';
+        $banner = '<div class="plugin-structpublish-banner ' . $shownRevision->getStatus() . $compactClass . '">';
 
         // status of the shown revision
         $banner .= '<span class="icon">' .
@@ -103,7 +109,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             '{version}' => hsc($rev->getVersion()),
         ];
 
-        $text = $this->getLang("banner_$name");
+        $text = $this->getLang($this->compactView ? "compact_banner_$name" : "banner_$name");
+
         $text = strtr($text, $replace);
 
         // add link to diff view
@@ -113,7 +120,9 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $text .= ' <a href="' . $link . '" title="' . $this->getLang('diff') . '">' . $icon . '</a>';
         }
 
-        return "<p class='$name'>$text</p>";
+        $tag = $this->compactView ? 'span' : 'p';
+
+        return "<$tag class='$name'>$text</$tag>";
     }
 
     /**
