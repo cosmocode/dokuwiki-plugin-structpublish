@@ -44,9 +44,7 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         $currentRevision = new Revision($dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
         $isPublished = $currentRevision->getStatus() === Constants::STATUS_PUBLISHED;
 
-        /** @var action_plugin_structpublish_sqlitefunction $functions */
-        $functions = plugin_load('action', 'structpublish_sqlitefunction');
-        if (!$functions->IS_PUBLISHER($ID)) {
+        if (!$dbHelper->isPublisher($ID)) {
             $latestPublished = $currentRevision->getLatestPublishedRevision();
             // there is no published revision, show nothing
             if (!$isPublished && is_null($latestPublished)) {
