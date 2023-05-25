@@ -35,7 +35,7 @@ class action_plugin_structpublish_cache extends DokuWiki_Action_Plugin
         $meta = p_get_metadata($cache->page, 'plugin struct');
         if (isset($meta['hasaggregation'])) {
             // separate caches for publishers/approvers and others
-             $cache->key .= ';' . action_plugin_structpublish_sqlitefunction::userHasRole($cache->page, '', []);
+             $cache->key .= ';' . helper_plugin_structpublish_db::userHasRole($cache->page, '', []);
 
             // rebuild cache name
             $cache->cache = getCacheName($cache->key, $cache->ext);
