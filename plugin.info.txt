@@ -1,7 +1,7 @@
 base   structpublish
 author Anna Dabrowska
 email  dokuwiki@cosmocode.de
-date   2023-05-17
+date   2023-05-22
 name   structpublish plugin
 desc   Publishing workflows based on struct
 url    https://dokuwiki.org/plugin:structpublish
