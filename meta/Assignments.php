@@ -122,15 +122,10 @@ class Assignments
         $pagerows = $this->sqlite->res2arr($res);
         $this->sqlite->res_close($res);
 
-        // reevalute the pages and unassign when needed
+        // remove page assignments matching the pattern being removed
+        $ok = true;
         foreach ($pagerows as $row) {
-            $rules = $this->getPageAssignments($row['pid'], false);
-            // remove assignments matching the rule
-            foreach ($rules as $status => $users) {
-                foreach ($users as $user) {
-                    $this->deassignPage($row['pid'], $user, $status);
-                }
-            }
+            $ok = $ok && $this->deassignPage($row['pid'], $user, $status);
         }
 
         return $ok;
@@ -206,7 +201,7 @@ class Assignments
      */
     public function deassignPage($page, $user, $status)
     {
-        $sql = 'REPLACE INTO structpublish_assignments (pid, user, status, assigned) VALUES (?, ?, ?, 0)';
+        $sql = 'UPDATE structpublish_assignments SET assigned = 0 WHERE pid = ? AND user = ? AND status = ?';
         return (bool) $this->sqlite->query($sql, [$page, $user, $status]);
     }
 

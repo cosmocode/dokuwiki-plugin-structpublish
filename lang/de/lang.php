@@ -26,6 +26,12 @@ $lang['banner_status_published'] = 'Diese Revision wurde am {datetime} von {user
 $lang['banner_latest_publish'] = 'Diese Seite wurde zuletzt am {datetime} von {user} als Version {version} freigegeben.';
 $lang['banner_previous_publish'] = 'Eine frühere Version dieser Seite wurde am {datetime} von {user} als Version {version} freigegeben.';
 $lang['banner_latest_draft'] = 'Diese Seite hat eine neue Entwurfsversion vom {revision}.';
+$lang['compact_banner_status_draft'] = 'Entwurf';
+$lang['compact_banner_status_approved'] = 'Bereit zur Freigabe';
+$lang['compact_banner_status_published'] = 'Version "{version}" freigegeben am {datetime} von {user}';
+$lang['compact_banner_latest_publish'] = '';
+$lang['compact_banner_previous_publish'] = '';
+$lang['compact_banner_latest_draft'] = 'Neuere Entwurfsrevision: {revision}';
 
 // admin
 $lang['assign_pattern'] = 'Seiten/Namensraum';
