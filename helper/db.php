@@ -12,7 +12,7 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
     {
         parent::init();
         if ($this->sqlite) {
-            $this->sqlite->create_function('IS_PUBLISHER', [$this, 'isPublisher'], -1);
+            $this->sqlite->getPdo()->sqliteCreateFunction('IS_PUBLISHER', [$this, 'isPublisher'], -1);
         }
     }
 
@@ -23,9 +23,7 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
     public function getPages()
     {
         $sql = 'SELECT pid FROM titles';
-        $res = $this->sqlite->query($sql);
-        $list = $this->sqlite->res2arr($res);
-        $this->sqlite->res_close($res);
+        $list = $this->sqlite->queryAll($sql);
         return array_column($list, 'pid');
     }
 
@@ -39,11 +37,7 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
         global $ID;
 
         $sql = 'SELECT pid FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
-        $res = $this->sqlite->query($sql, $ID);
-        if ($res && $this->sqlite->res2count($res)) {
-            return true;
-        }
-        return false;
+        return (bool) $this->sqlite->queryAll($sql, $ID);
     }
 
     /**

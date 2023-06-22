@@ -2,6 +2,8 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
+use dokuwiki\plugin\sqlite\SQLiteDB;
+
 /**
  * Class Assignments
  *
@@ -12,7 +14,7 @@ namespace dokuwiki\plugin\structpublish\meta;
  */
 class Assignments
 {
-    /** @var \helper_plugin_sqlite|null */
+    /** @var SQLiteDB */
     protected $sqlite;
 
     /** @var  array All the assignments patterns */
@@ -56,9 +58,7 @@ class Assignments
     protected function loadPatterns()
     {
         $sql = 'SELECT * FROM structpublish_assignments_patterns ORDER BY pattern';
-        $res = $this->sqlite->query($sql);
-        $this->patterns = $this->sqlite->res2arr($res);
-        $this->sqlite->res_close($res);
+        $this->patterns = $this->sqlite->queryAll($sql);
     }
 
     /**
@@ -118,9 +118,7 @@ class Assignments
 
         // fetch possibly affected pages
         $sql = 'SELECT pid FROM structpublish_assignments WHERE user = ? AND status = ?';
-        $res = $this->sqlite->query($sql, [$user, $status]);
-        $pagerows = $this->sqlite->res2arr($res);
-        $this->sqlite->res_close($res);
+        $pagerows = $this->sqlite->queryAll($sql, [$user, $status]);
 
         // remove page assignments matching the pattern being removed
         $ok = true;
@@ -239,9 +237,7 @@ class Assignments
         } else {
             // just select
             $sql = 'SELECT user, status FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
-            $res = $this->sqlite->query($sql, [$page]);
-            $list = $this->sqlite->res2arr($res);
-            $this->sqlite->res_close($res);
+            $list = $this->sqlite->queryAll($sql, [$page]);
             foreach ($list as $row) {
                 $rules[$row['status']][] = $row['user'];
             }
@@ -268,9 +264,7 @@ class Assignments
 
         $sql .= ' ORDER BY pid, user, status';
 
-        $res = $this->sqlite->query($sql, $opts);
-        $list = $this->sqlite->res2arr($res);
-        $this->sqlite->res_close($res);
+        $list = $this->sqlite->queryAll($sql, $opts);
 
         $result = array();
         foreach ($list as $row) {
@@ -287,7 +281,7 @@ class Assignments
     }
 
     /**
-     * @return \helper_plugin_sqlite|null
+     * @return SQLiteDB
      */
     public function getSqlite()
     {

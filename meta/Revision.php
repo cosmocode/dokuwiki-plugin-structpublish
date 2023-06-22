@@ -2,6 +2,7 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
+use dokuwiki\plugin\sqlite\SQLiteDB;
 use dokuwiki\plugin\struct\meta\ConfigParser;
 use dokuwiki\plugin\struct\meta\Schema;
 use dokuwiki\plugin\struct\meta\SearchConfig;
@@ -12,7 +13,7 @@ use dokuwiki\plugin\struct\meta\Value;
  */
 class Revision
 {
-    /** @var \helper_plugin_sqlite */
+    /** @var SQLiteDB */
     protected $sqlite;
 
     protected $schema;
@@ -34,7 +35,7 @@ class Revision
     /**
      * Constructor
      *
-     * @param \helper_plugin_sqlite $sqlite
+     * @param SQLiteDB $sqlite
      * @param string $id page id
      * @param int $rev revision
      */

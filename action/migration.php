@@ -1,5 +1,7 @@
 <?php
 
+use dokuwiki\plugin\sqlite\Tools;
+
 class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 {
     const MIN_DB_STRUCT = 19;
@@ -63,7 +65,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * Read the current versions for struct and struct publish from the database
      *
-     * @param helper_plugin_sqlite $sqlite
+     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
      * @return array [structversion, structpublishversion]
      */
     protected function getDbVersions($sqlite)
@@ -72,8 +74,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         $dbVersionStructpublish = null;
 
         $sql = 'SELECT opt, val FROM opts WHERE opt=? OR opt=?';
-        $res = $sqlite->query($sql, 'dbversion', 'dbversion_structpublish');
-        $vals = $sqlite->res2arr($res);
+        $vals = $sqlite->queryAll($sql, ['dbversion', 'dbversion_structpublish']);
 
         foreach ($vals as $val) {
             if ($val['opt'] === 'dbversion') {
@@ -97,7 +98,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * Database setup
      *
-     * @param helper_plugin_sqlite $sqlite
+     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
      * @return bool
      */
     protected function migration1($sqlite)
@@ -109,12 +110,14 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         if ($ok) {
             $sql = io_readFile(DOKU_PLUGIN . 'structpublish/db/update0001.sql', false);
-
-            $sql = $sqlite->SQLstring2array($sql);
-            array_unshift($sql, 'BEGIN TRANSACTION');
-            array_push($sql, "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')");
-            array_push($sql, "COMMIT TRANSACTION");
-            $ok = $sqlite->doTransaction($sql);
+            $sqlArr = Tools::SQLstring2array($sql);
+            foreach ($sqlArr as $sql) {
+                $ok = $ok && $sqlite->query($sql);
+            }
+        }
+        if ($ok) {
+            $sql = "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')";
+            $ok = $ok && $sqlite->query($sql);
         }
 
         return $ok;
