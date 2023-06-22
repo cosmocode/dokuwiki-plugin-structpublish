@@ -29,8 +29,6 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
 
         if (!$helper->isPublishable()) return;
 
-        $sqlite = $helper->getDB();
-
         $elCount = $form->elementCount();
         $checkName = 'rev2[]';
 
@@ -49,7 +47,7 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
             }
 
             // get most recent status for rev
-            $revision = new Revision($sqlite, $INFO['id'], $rev);
+            $revision = new Revision($INFO['id'], $rev);
             $status = $revision->getStatus();
             $version = $revision->getVersion();
 

@@ -43,9 +43,9 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         $this->compactView = (bool)$this->getConf('compact_view');
 
         // get the possible revisions needed in the banner
-        $newestRevision = new Revision($this->dbHelper->getDB(), $ID, $INFO['currentrev']);
+        $newestRevision = new Revision($ID, $INFO['currentrev']);
         if ($REV) {
-            $shownRevision = new Revision($this->dbHelper->getDB(), $ID, $REV);
+            $shownRevision = new Revision($ID, $REV);
         } else {
             $shownRevision = $newestRevision;
         }

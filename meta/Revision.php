@@ -35,13 +35,11 @@ class Revision
     /**
      * Constructor
      *
-     * @param SQLiteDB $sqlite
      * @param string $id page id
      * @param int $rev revision
      */
-    public function __construct($sqlite, $id, $rev)
+    public function __construct($id, $rev)
     {
-        $this->sqlite = $sqlite;
         $this->id = $id;
         $this->rev = $rev;
         $this->published = 0;
@@ -279,7 +277,7 @@ class Revision
             return null;
         }
 
-        $published = new Revision($this->sqlite, $this->id,
+        $published = new Revision($this->id,
             $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue());
 
         $published->setStatus($latestPublished[$this->statusCol->getColref() - 1]->getRawValue());

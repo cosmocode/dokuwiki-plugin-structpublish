@@ -39,8 +39,7 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
             throw new \Exception('User may not ' . $action);
         }
 
-        $sqlite = $this->dbHelper->getDB();
-        $revision = new Revision($sqlite, $ID, $INFO['currentrev']);
+        $revision = new Revision($ID, $INFO['currentrev']);
 
         if ($action === Constants::ACTION_PUBLISH) {
             $revision->setVersion($newversion);

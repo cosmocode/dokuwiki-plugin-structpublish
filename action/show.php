@@ -41,7 +41,7 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
             return;
         }
 
-        $currentRevision = new Revision($dbHelper->getDB(), $ID, $REV ?: $INFO['currentrev']);
+        $currentRevision = new Revision($ID, $REV ?: $INFO['currentrev']);
         $isPublished = $currentRevision->getStatus() === Constants::STATUS_PUBLISHED;
 
         if (!$dbHelper->isPublisher($ID)) {
