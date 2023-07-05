@@ -60,21 +60,15 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         // execute the migrations
         $ok = true;
 
-        $sqlite->getPdo()->beginTransaction();
-        try {
-            foreach ($pending as $version) {
-                $call = 'migration' . $version;
-                $ok = $ok && $this->$call($sqlite);
-            }
+        foreach ($pending as $version) {
+            $call = 'migration' . $version;
+            $ok = $ok && $this->$call($sqlite);
+        }
 
-            // update migration status in struct database
-            if ($ok) {
-                $sql = "REPLACE INTO opts (val,opt) VALUES ($version,'dbversion_structpublish')";
-                $ok = $ok && $sqlite->query($sql);
-            }
-            $sqlite->getPdo()->commit();
-        } catch (Exception $e) {
-            $sqlite->getPdo()->rollBack();
+        // update migration status in struct database
+        if ($ok) {
+            $sql = "REPLACE INTO opts (val,opt) VALUES ($version,'dbversion_structpublish')";
+            $ok = $ok && $sqlite->query($sql);
         }
 
         return $ok;
