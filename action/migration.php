@@ -6,6 +6,9 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 {
     const MIN_DB_STRUCT = 19;
 
+    /** @var string  */
+    protected $table = 'data_structpublish';
+
     /**
      * @inheritDoc
      */
@@ -15,7 +18,9 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     }
 
     /**
-     * Call our custom migrations when defined
+     * Call our custom migrations. We do not use our own database,
+     * so we cannot use the mechanism in sqlite init()
+     * which processes updateXXXX.sql files
      *
      * @param Doku_Event $event
      * @return bool
@@ -47,16 +52,29 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
         }
 
         // check whether we have any pending migrations
-        $pending = range($dbVersionStructpublish ?: 1, $latestVersion);
+        $pending = range(($dbVersionStructpublish ?: 0) + 1, $latestVersion);
         if (empty($pending)) {
             return true;
         }
 
         // execute the migrations
         $ok = true;
-        foreach ($pending as $version) {
-            $call = 'migration' . $version;
-            $ok = $ok && $this->$call($sqlite);
+
+        $sqlite->getPdo()->beginTransaction();
+        try {
+            foreach ($pending as $version) {
+                $call = 'migration' . $version;
+                $ok = $ok && $this->$call($sqlite);
+            }
+
+            // update migration status in struct database
+            if ($ok) {
+                $sql = "REPLACE INTO opts (val,opt) VALUES ($version,'dbversion_structpublish')";
+                $ok = $ok && $sqlite->query($sql);
+            }
+            $sqlite->getPdo()->commit();
+        } catch (Exception $e) {
+            $sqlite->getPdo()->rollBack();
         }
 
         return $ok;
@@ -115,11 +133,25 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
                 $ok = $ok && $sqlite->query($sql);
             }
         }
-        if ($ok) {
-            $sql = "INSERT OR REPLACE INTO opts (val,opt) VALUES (1,'dbversion_structpublish')";
-            $ok = $ok && $sqlite->query($sql);
-        }
 
         return $ok;
+    }
+
+    /**
+     * Reset 'latest' flag to 0 for all rows except actually latest ones
+     * for each pid / status combination.
+     *
+     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @return bool
+     */
+    protected function migration2($sqlite)
+    {
+        $sql = "SELECT rid, pid, latest, col1, max(col4) FROM $this->table GROUP BY pid, col1";
+        $latest = $sqlite->queryAll($sql);
+        $rids = array_column($latest, 'rid');
+
+        $sql = "UPDATE $this->table SET latest = 0 WHERE rid NOT IN (" . implode(', ', $rids) . ')';
+
+        return (bool) $sqlite->query($sql);
     }
 }
