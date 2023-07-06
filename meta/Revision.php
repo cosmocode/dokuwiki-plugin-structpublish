@@ -251,6 +251,8 @@ class Revision
         $parser = new ConfigParser($lines);
         $config = $parser->getConfig();
         $search = new SearchConfig($config);
+        // disable 'latest' flag in select query
+        $search->setSelectLatest(false);
         $data = $search->execute();
         if (!empty($data)) {
             return array_pop($data);
