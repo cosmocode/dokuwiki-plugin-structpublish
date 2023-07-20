@@ -33,4 +33,3 @@ class syntax_plugin_structpublish_table extends syntax_plugin_struct_serial
         return $config;
     }
 }
-

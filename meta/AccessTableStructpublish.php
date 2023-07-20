@@ -82,18 +82,14 @@ class AccessTableStructpublish extends AccessTableSerial
 
     /**
      * Remove latest status from previous publish data
-     * for the current page id and status
+     * for the current page id
      */
     protected function beforeSave()
     {
-        $statusCol = $this->schema->findColumn('status');
-        $statusColRef = $statusCol->getColref();
-        $statusColName = $statusCol->getColName();
-
         /** @noinspection SqlResolve */
         return $this->sqlite->query(
-            "UPDATE $this->stable SET latest = 0 WHERE latest = 1 AND pid = ? AND $statusColName = ?",
-            [$this->pid, $this->singleValues[$statusColRef - 1]]
+            "UPDATE $this->stable SET latest = 0 WHERE latest = 1 AND pid = ?",
+            [$this->pid]
         );
     }
 }
