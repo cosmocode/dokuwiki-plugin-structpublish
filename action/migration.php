@@ -148,4 +148,33 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         return (bool) $sqlite->query($sql);
     }
+
+    /**
+     * Set 'latest' flag to 0 for all rows except actually latest ones
+     * for each page,
+     *
+     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @return bool
+     */
+    protected function migration3($sqlite)
+    {
+        $sql = "WITH cte AS (
+            SELECT rid, pid, col1 AS status, col4 as rev,
+                   rank() OVER ( PARTITION BY pid
+                       ORDER BY col4 DESC, col1 = 'draft', col1 = 'approved', col1 = 'published'
+                   ) AS r
+            FROM data_structpublish
+        )
+        SELECT rid, pid, status, rev
+        FROM cte
+        WHERE r  = 1
+        ORDER BY pid ASC;";
+
+        $latest = $sqlite->queryAll($sql);
+        $rids = array_column($latest, 'rid');
+
+        $sql = "UPDATE $this->table SET latest = 0 WHERE rid NOT IN (" . implode(', ', $rids) . ')';
+
+        return (bool) $sqlite->query($sql);
+    }
 }

@@ -2,18 +2,35 @@
 
 use dokuwiki\plugin\structpublish\meta\Assignments;
 
-/**
- * @todo by extending helper_plugin_struct_db we break the singlton pattern and have two database connections
- */
-class helper_plugin_structpublish_db extends helper_plugin_struct_db
+class helper_plugin_structpublish_db extends DokuWiki_Plugin
 {
-    /** @inheritdoc */
-    protected function init()
+    protected $initialized = false;
+
+    /**
+     * Access the struct database
+     *
+     * Registers our own IS_PUBLISHER function with sqlite
+     *
+     * @return \dokuwiki\plugin\sqlite\SQLiteDB|null
+     */
+    public function getDB()
     {
-        parent::init();
-        if ($this->sqlite) {
-            $this->sqlite->getPdo()->sqliteCreateFunction('IS_PUBLISHER', [$this, 'isPublisher'], -1);
+        /** @var helper_plugin_struct_db $struct */
+        $struct = plugin_load('helper', 'struct_db');
+        if(!$struct) {
+            // FIXME show message?
+            return null;
         }
+        $sqlite = $struct->getDB(false);
+        if(!$sqlite) return null;
+
+        // on init
+        if(!$this->initialized) {
+            $sqlite->getPdo()->sqliteCreateFunction('IS_PUBLISHER', [$this, 'isPublisher'], -1);
+            $this->initialized = true;
+        }
+
+        return $sqlite;
     }
 
     /**
@@ -22,8 +39,11 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
      */
     public function getPages()
     {
+        $sqlite = $this->getDB();
+        if(!$sqlite) return [];
+
         $sql = 'SELECT pid FROM titles';
-        $list = $this->sqlite->queryAll($sql);
+        $list = $sqlite->queryAll($sql);
         return array_column($list, 'pid');
     }
 
@@ -35,9 +55,11 @@ class helper_plugin_structpublish_db extends helper_plugin_struct_db
     public function isPublishable()
     {
         global $ID;
+        $sqlite = $this->getDB();
+        if(!$sqlite) return false;
 
         $sql = 'SELECT pid FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
-        return (bool) $this->sqlite->queryAll($sql, $ID);
+        return (bool) $sqlite->queryAll($sql, $ID);
     }
 
     /**
