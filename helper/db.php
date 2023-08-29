@@ -48,18 +48,21 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     }
 
     /**
-     * Returns true if the current page is included in publishing workflows
+     * Returns true if the given page is included in publishing workflows.
+     * If no pid is given, check current page.
      *
      * @return bool
      */
-    public function isPublishable()
+    public function isPublishable($pid = null)
     {
         global $ID;
         $sqlite = $this->getDB();
         if(!$sqlite) return false;
 
+        if (!$pid) $pid = $ID;
+
         $sql = 'SELECT pid FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
-        return (bool) $sqlite->queryAll($sql, $ID);
+        return (bool) $sqlite->queryAll($sql, $pid);
     }
 
     /**
@@ -84,13 +87,19 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
      */
     public function isPublisher()
     {
-        if (!$this->isPublishable()) return 1;
 
         global $USERINFO;
         global $INPUT;
 
         $args = func_get_args();
         $pid = $args[0];
+
+        if (!$pid) return 1;
+
+        if (!$this->isPublishable($pid)) {
+            return 1;
+        }
+
         $userId = $args[1] ?? $INPUT->server->str('REMOTE_USER');
         $grps = $args[2] ?? ($USERINFO['grps'] ?? []);
 
