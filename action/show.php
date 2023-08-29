@@ -6,7 +6,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
 {
     /** @var int */
-    static protected $latestPublishedRev;
+    protected static $latestPublishedRev;
 
     /** @inheritDoc */
     public function register(Doku_Event_Handler $controller)

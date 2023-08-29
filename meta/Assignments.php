@@ -26,7 +26,7 @@ class Assignments
     /**
      * Get the singleton instance of the Assignments
      *
-     * @param bool $forcereload create a new instace to reload the assignment data
+     * @param bool $forcereload create a new instance to reload the assignment data
      * @return Assignments
      */
     public static function getInstance($forcereload = false)

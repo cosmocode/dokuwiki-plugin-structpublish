@@ -37,7 +37,7 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
 
         try {
             $assignments = Assignments::getInstance();
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             msg($e->getMessage(), -1);
             return;
         }
@@ -46,8 +46,11 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
             $assignment = $INPUT->arr('assignment');
             if (!blank($assignment['pattern']) && !blank($assignment['status'])) {
                 if ($INPUT->str('action') === 'delete') {
-                    $ok = $assignments->removePattern($assignment['pattern'], $assignment['user'],
-                        $assignment['status']);
+                    $ok = $assignments->removePattern(
+                        $assignment['pattern'],
+                        $assignment['user'],
+                        $assignment['status']
+                    );
                     if (!$ok) {
                         msg('failed to remove pattern', -1);
                     }
@@ -56,15 +59,21 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
                         if (@preg_match($assignment['pattern'], null) === false) {
                             msg('Invalid regular expression. Pattern not saved', -1);
                         } else {
-                            $ok = $assignments->addPattern($assignment['pattern'], $assignment['user'],
-                                $assignment['status']);
+                            $ok = $assignments->addPattern(
+                                $assignment['pattern'],
+                                $assignment['user'],
+                                $assignment['status']
+                            );
                             if (!$ok) {
                                 msg('failed to add pattern', -1);
                             }
                         }
                     } else {
-                        $ok = $assignments->addPattern($assignment['pattern'], $assignment['user'],
-                            $assignment['status']);
+                        $ok = $assignments->addPattern(
+                            $assignment['pattern'],
+                            $assignment['user'],
+                            $assignment['status']
+                        );
                         if (!$ok) {
                             msg('failed to add pattern', -1);
                         }
@@ -87,7 +96,7 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
 
         try {
             $assignments = Assignments::getInstance();
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             msg($e->getMessage(), -1);
             return;
         }
@@ -152,4 +161,3 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
         echo '</form>';
     }
 }
-

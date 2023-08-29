@@ -12,7 +12,6 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class helper_plugin_structpublish_publish extends DokuWiki_Plugin
 {
-
     /** @var helper_plugin_structpublish_db  */
     protected $dbHelper;
 
@@ -33,9 +32,7 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
         global $ID;
         global $INFO;
 
-        if (
-            !$this->dbHelper->checkAccess($ID, [$action])
-        ) {
+        if (!$this->dbHelper->checkAccess($ID, [$action])) {
             throw new \Exception('User may not ' . $action);
         }
 
@@ -81,10 +78,14 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
             $sqlite->query("UPDATE multi_$table SET published = 0 WHERE pid = ?", [$ID]);
 
             // publish the current revision
-            $sqlite->query("UPDATE data_$table SET published = 1 WHERE pid = ? AND rev = ?",
-                [$ID, $INFO['currentrev']]);
-            $sqlite->query("UPDATE multi_$table SET published = 1 WHERE pid = ? AND rev = ?",
-                [$ID, $INFO['currentrev']]);
+            $sqlite->query(
+                "UPDATE data_$table SET published = 1 WHERE pid = ? AND rev = ?",
+                [$ID, $INFO['currentrev']]
+            );
+            $sqlite->query(
+                "UPDATE multi_$table SET published = 1 WHERE pid = ? AND rev = ?",
+                [$ID, $INFO['currentrev']]
+            );
         }
     }
 }

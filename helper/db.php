@@ -17,15 +17,17 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     {
         /** @var helper_plugin_struct_db $struct */
         $struct = plugin_load('helper', 'struct_db');
-        if(!$struct) {
+        if (!$struct) {
             // FIXME show message?
             return null;
         }
         $sqlite = $struct->getDB(false);
-        if(!$sqlite) return null;
+        if (!$sqlite) {
+            return null;
+        }
 
         // on init
-        if(!$this->initialized) {
+        if (!$this->initialized) {
             $sqlite->getPdo()->sqliteCreateFunction('IS_PUBLISHER', [$this, 'isPublisher'], -1);
             $this->initialized = true;
         }
@@ -35,12 +37,15 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
 
     /**
      * Get list of all pages known to the plugin
+     *
      * @return array
      */
     public function getPages()
     {
         $sqlite = $this->getDB();
-        if(!$sqlite) return [];
+        if (!$sqlite) {
+            return [];
+        }
 
         $sql = 'SELECT pid FROM titles';
         $list = $sqlite->queryAll($sql);
@@ -57,9 +62,13 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     {
         global $ID;
         $sqlite = $this->getDB();
-        if(!$sqlite) return false;
+        if (!$sqlite) {
+            return false;
+        }
 
-        if (!$pid) $pid = $ID;
+        if (!$pid) {
+            $pid = $ID;
+        }
 
         $sql = 'SELECT pid FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
         return (bool) $sqlite->queryAll($sql, $pid);
@@ -94,9 +103,7 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
         $args = func_get_args();
         $pid = $args[0];
 
-        if (!$pid) return 1;
-
-        if (!$this->isPublishable($pid)) {
+        if (!$pid || !$this->isPublishable($pid)) {
             return 1;
         }
 
@@ -152,5 +159,4 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
 
         return false;
     }
-
 }

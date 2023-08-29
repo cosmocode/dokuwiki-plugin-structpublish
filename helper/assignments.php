@@ -16,7 +16,6 @@ class helper_plugin_structpublish_assignments extends DokuWiki_Plugin
      * @param string|null $pns optimization, the colon wrapped namespace of the page, set null for automatic
      * @return bool
      * @author Andreas Gohr
-     *
      */
     public function matchPagePattern($pattern, $page, $pns = null)
     {
