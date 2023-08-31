@@ -65,6 +65,7 @@ class Revision
 
     /**
      * Store the currently set structpublish meta data in the database
+     *
      * @return void
      */
     public function save()
@@ -197,6 +198,7 @@ class Revision
 
     /**
      * The page ID this revision is for
+     *
      * @return string
      */
     public function getId()
@@ -229,6 +231,7 @@ class Revision
      * Fetches data from the structpublish schema for the current page.
      * Returns an array of struct Value objects, not literal values.
      * $andFilters can be used to limit the search, e.g. by status or revision
+     *
      * @see https://www.dokuwiki.org/plugin:struct:filters
      *
      * @param array $andFilters
@@ -244,8 +247,9 @@ class Revision
         ];
 
         if (!empty($andFilters)) {
-            foreach ($andFilters as $filter)
-            $lines[] = 'filter: ' . $filter;
+            foreach ($andFilters as $filter) {
+                $lines[] = 'filter: ' . $filter;
+            }
         }
 
         $parser = new ConfigParser($lines);
@@ -279,8 +283,10 @@ class Revision
             return null;
         }
 
-        $published = new Revision($this->id,
-            $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue());
+        $published = new Revision(
+            $this->id,
+            $latestPublished[$this->revisionCol->getColref() - 1]->getRawValue()
+        );
 
         $published->setStatus($latestPublished[$this->statusCol->getColref() - 1]->getRawValue());
         $published->setUser($latestPublished[$this->userCol->getColref() - 1]->getRawValue());

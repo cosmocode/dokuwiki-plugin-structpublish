@@ -3,6 +3,7 @@
 /**
  * Double caching of pages containing struct aggregations:
  * one for regular users, one for publishers/approvers
+ *
  * @see action_plugin_struct_cache
  */
 class action_plugin_structpublish_cache extends DokuWiki_Action_Plugin

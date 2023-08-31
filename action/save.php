@@ -41,7 +41,7 @@ class action_plugin_structpublish_save extends DokuWiki_Action_Plugin
 
         try {
             $revision->save();
-        } catch(StructException $e) {
+        } catch (StructException $e) {
             msg($e->getMessage(), -1);
         }
     }

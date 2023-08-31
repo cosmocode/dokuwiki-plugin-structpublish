@@ -18,7 +18,6 @@ class Constants
     const ACTION_APPROVE = 'approve';
     const ACTION_PUBLISH = 'publish';
 
-
     /**
      * Convenience function mapping transition actions to resulting status
      *

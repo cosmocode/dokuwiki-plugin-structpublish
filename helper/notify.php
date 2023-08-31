@@ -29,7 +29,9 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
     public function sendEmails($action, $newRevision)
     {
 
-        if (!$this->triggerNotification($action)) return;
+        if (!$this->triggerNotification($action)) {
+            return;
+        }
 
         // get assignees from DB
         $assignments = Assignments::getInstance();
@@ -37,7 +39,9 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
 
         // get recipients for the next workflow step
         $nextAction = Constants::workflowSteps($action)['nextAction'];
-        if (is_null($nextAction)) return;
+        if (is_null($nextAction)) {
+            return;
+        }
 
         if (empty($assignees[$nextAction])) {
             msg($this->getLang('email_error_norecipients'), -1);
@@ -133,7 +137,9 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
         /** @var AuthPlugin $auth */
         global $auth;
         $user = $auth->getUserData($recipient);
-        if ($user) $resolved[] = $user['mail'];
+        if ($user) {
+            $resolved[] = $user['mail'];
+        }
     }
 
     /**
@@ -143,7 +149,9 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
      */
     private function triggerNotification($action)
     {
-        if (!$this->getConf('email_enable')) return false;
+        if (!$this->getConf('email_enable')) {
+            return false;
+        }
 
         $actions = array_map('trim', explode(',', $this->getConf('email_status')));
         return in_array($action, $actions);

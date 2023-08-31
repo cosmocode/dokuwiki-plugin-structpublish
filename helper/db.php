@@ -17,15 +17,17 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     {
         /** @var helper_plugin_struct_db $struct */
         $struct = plugin_load('helper', 'struct_db');
-        if(!$struct) {
+        if (!$struct) {
             // FIXME show message?
             return null;
         }
         $sqlite = $struct->getDB(false);
-        if(!$sqlite) return null;
+        if (!$sqlite) {
+            return null;
+        }
 
         // on init
-        if(!$this->initialized) {
+        if (!$this->initialized) {
             $sqlite->getPdo()->sqliteCreateFunction('IS_PUBLISHER', [$this, 'isPublisher'], -1);
             $this->initialized = true;
         }
@@ -35,12 +37,15 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
 
     /**
      * Get list of all pages known to the plugin
+     *
      * @return array
      */
     public function getPages()
     {
         $sqlite = $this->getDB();
-        if(!$sqlite) return [];
+        if (!$sqlite) {
+            return [];
+        }
 
         $sql = 'SELECT pid FROM titles';
         $list = $sqlite->queryAll($sql);
@@ -48,18 +53,25 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     }
 
     /**
-     * Returns true if the current page is included in publishing workflows
+     * Returns true if the given page is included in publishing workflows.
+     * If no pid is given, check current page.
      *
      * @return bool
      */
-    public function isPublishable()
+    public function isPublishable($pid = null)
     {
         global $ID;
         $sqlite = $this->getDB();
-        if(!$sqlite) return false;
+        if (!$sqlite) {
+            return false;
+        }
+
+        if (!$pid) {
+            $pid = $ID;
+        }
 
         $sql = 'SELECT pid FROM structpublish_assignments WHERE pid = ? AND assigned = 1';
-        return (bool) $sqlite->queryAll($sql, $ID);
+        return (bool) $sqlite->queryAll($sql, $pid);
     }
 
     /**
@@ -84,13 +96,17 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
      */
     public function isPublisher()
     {
-        if (!$this->isPublishable()) return 1;
 
         global $USERINFO;
         global $INPUT;
 
         $args = func_get_args();
         $pid = $args[0];
+
+        if (!$pid || !$this->isPublishable($pid)) {
+            return 1;
+        }
+
         $userId = $args[1] ?? $INPUT->server->str('REMOTE_USER');
         $grps = $args[2] ?? ($USERINFO['grps'] ?? []);
 
@@ -143,5 +159,4 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
 
         return false;
     }
-
 }

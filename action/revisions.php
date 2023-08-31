@@ -1,11 +1,10 @@
 <?php
 
 use dokuwiki\plugin\structpublish\meta\Revision;
-use \dokuwiki\plugin\structpublish\meta\Constants;
+use dokuwiki\plugin\structpublish\meta\Constants;
 
 class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
 {
-
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('FORM_REVISIONS_OUTPUT', 'BEFORE', $this, 'handleRevisions');
@@ -27,7 +26,9 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
         /** @var helper_plugin_structpublish_db $helper */
         $helper = plugin_load('helper', 'structpublish_db');
 
-        if (!$helper->isPublishable()) return;
+        if (!$helper->isPublishable()) {
+            return;
+        }
 
         $elCount = $form->elementCount();
         $checkName = 'rev2[]';
@@ -52,9 +53,14 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
             $version = $revision->getVersion();
 
             // insert status for published revisions
-            if (is_a($el, \dokuwiki\Form\HTMLElement::class) && !empty(trim($el->val())) && $status === Constants::STATUS_PUBLISHED) {
+            if (
+                is_a($el, \dokuwiki\Form\HTMLElement::class) &&
+                !empty(trim($el->val())) &&
+                $status === Constants::STATUS_PUBLISHED
+            ) {
                 $val = $el->val();
-                $label = '<span class="plugin-structpublish-version">' . $status . ' (' . $this->getLang('version') . ' ' . $version . ')</span>';
+                $label = '<span class="plugin-structpublish-version">' .
+                    $status . ' (' . $this->getLang('version') . ' ' . $version . ')</span>';
                 $el->val("$val $label");
             }
         }

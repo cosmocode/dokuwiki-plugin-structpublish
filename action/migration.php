@@ -42,7 +42,9 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         // check if struct has required version
         if ($dbVersionStruct < self::MIN_DB_STRUCT) {
-            throw new Exception('Plugin struct is outdated. Minimum required database version is ' . self::MIN_DB_STRUCT);
+            throw new Exception(
+                'Plugin struct is outdated. Minimum required database version is ' . self::MIN_DB_STRUCT
+            );
         }
 
         // check whether we are already up-to-date
