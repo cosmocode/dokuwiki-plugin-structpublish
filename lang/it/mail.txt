@@ -1,0 +1,5 @@
+Buongiorno,
+
+lo stato della pagina “@PAGE@” è cambiato in @STATUS_CURRENT@.
+
+Si può modificare la revisione al seguente indirizzo: @URL@
