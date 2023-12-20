@@ -1,11 +1,14 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
 use dokuwiki\plugin\structpublish\meta\Constants;
 
-class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_publish extends ActionPlugin
 {
     /** @inheritDoc */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'changeStatus');
     }
@@ -13,11 +16,11 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     /**
      * Handle the publish button and version field
      *
-     * @param Doku_Event $event
+     * @param Event $event
      * @return void
      * @throws Exception
      */
-    public function changeStatus(Doku_Event $event)
+    public function changeStatus(Event $event)
     {
         if ($event->data != 'show') {
             return;

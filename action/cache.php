@@ -1,20 +1,25 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
+use dokuwiki\Cache\CacheParser;
+
 /**
  * Double caching of pages containing struct aggregations:
  * one for regular users, one for publishers/approvers
  *
  * @see action_plugin_struct_cache
  */
-class action_plugin_structpublish_cache extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_cache extends ActionPlugin
 {
     /**
      * Registers a callback function for a given event
      *
-     * @param Doku_Event_Handler $controller DokuWiki's event controller object
+     * @param EventHandler $controller DokuWiki's event controller object
      * @return void
      */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('PARSER_CACHE_USE', 'BEFORE', $this, 'handleCacheAggregation');
     }
@@ -23,12 +28,12 @@ class action_plugin_structpublish_cache extends DokuWiki_Action_Plugin
      * For pages containing an aggregation, add structpublish flag to cache key
      * to differentiate between caches for regular and privileged users
      *
-     * @param Doku_Event $event event object by reference
+     * @param Event $event event object by reference
      * @return bool
      */
-    public function handleCacheAggregation(Doku_Event $event)
+    public function handleCacheAggregation(Event $event)
     {
-        /** @var \dokuwiki\Cache\CacheParser $cache */
+        /** @var CacheParser $cache */
         $cache = $event->data;
         if ($cache->mode != 'xhtml') return true;
         if (!$cache->page) return true; // not a page cache
