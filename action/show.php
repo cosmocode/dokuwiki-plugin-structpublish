@@ -1,15 +1,18 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
 use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
-class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_show extends ActionPlugin
 {
     /** @var int */
     protected static $latestPublishedRev;
 
     /** @inheritDoc */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handleShow');
         $controller->register_hook('HTML_SHOWREV_OUTPUT', 'BEFORE', $this, 'handleShowrev');
@@ -18,10 +21,10 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
     /**
      * Decide which revision to show based on role assignments
      *
-     * @param Doku_Event $event
+     * @param Event $event
      * @return void
      */
-    public function handleShow(Doku_Event $event)
+    public function handleShow(Event $event)
     {
         if ($event->data != 'show') {
             return;
@@ -67,10 +70,10 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
      * Suppress message about viewing an old revision if it is the latest one
      * that the current user is allowed to see.
      *
-     * @param Doku_Event $event
+     * @param Event $event
      * @return void
      */
-    public function handleShowrev(Doku_Event $event)
+    public function handleShowrev(Event $event)
     {
         /** @var helper_plugin_structpublish_db $dbHelper */
         $dbHelper = plugin_load('helper', 'structpublish_db');

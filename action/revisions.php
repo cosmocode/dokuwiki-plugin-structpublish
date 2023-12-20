@@ -1,11 +1,16 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
+use dokuwiki\Form\CheckableElement;
+use dokuwiki\Form\HTMLElement;
 use dokuwiki\plugin\structpublish\meta\Revision;
 use dokuwiki\plugin\structpublish\meta\Constants;
 
-class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_revisions extends ActionPlugin
 {
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('FORM_REVISIONS_OUTPUT', 'BEFORE', $this, 'handleRevisions');
     }
@@ -13,10 +18,10 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
     /**
      * Adds publish info to page revisions
      *
-     * @param Doku_Event $event
+     * @param Event $event
      * @return void
      */
-    public function handleRevisions(Doku_Event $event)
+    public function handleRevisions(Event $event)
     {
         global $INFO;
 
@@ -36,12 +41,12 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
         for ($i = 0; $i < $elCount; $i++) {
             $el = $form->getElementAt($i);
 
-            if (!is_a($el, \dokuwiki\Form\CheckableElement::class) && !is_a($el, \dokuwiki\Form\HTMLElement::class)) {
+            if (!$el instanceof CheckableElement && !$el instanceof HTMLElement) {
                 continue;
             }
 
             // extract rev from checkbox info
-            if (is_a($el, \dokuwiki\Form\CheckableElement::class)) {
+            if (is_a($el, CheckableElement::class)) {
                 if ($el->attr('name') === $checkName) {
                     $rev = $el->attr('value');
                 }
@@ -54,7 +59,7 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
 
             // insert status for published revisions
             if (
-                is_a($el, \dokuwiki\Form\HTMLElement::class) &&
+                is_a($el, HTMLElement::class) &&
                 !empty(trim($el->val())) &&
                 $status === Constants::STATUS_PUBLISHED
             ) {

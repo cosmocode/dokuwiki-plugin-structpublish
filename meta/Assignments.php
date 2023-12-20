@@ -21,7 +21,7 @@ class Assignments
     protected $patterns;
 
     /** @var Assignments */
-    protected static $instance = null;
+    protected static $instance;
 
     /**
      * Get the singleton instance of the Assignments
@@ -31,8 +31,8 @@ class Assignments
      */
     public static function getInstance($forcereload = false)
     {
-        if (is_null(self::$instance) or $forcereload) {
-            $class = get_called_class();
+        if (is_null(self::$instance) || $forcereload) {
+            $class = static::class;
             self::$instance = new $class();
         }
         return self::$instance;
@@ -256,7 +256,7 @@ class Assignments
     {
         $sql = 'SELECT pid, user, status, assigned FROM structpublish_assignments WHERE 1=1';
 
-        $opts = array();
+        $opts = [];
 
         if ($assignedOnly) {
             $sql .= ' AND assigned = 1';
@@ -266,13 +266,13 @@ class Assignments
 
         $list = $this->sqlite->queryAll($sql, $opts);
 
-        $result = array();
+        $result = [];
         foreach ($list as $row) {
             $pid = $row['pid'];
             $user = $row['user'];
             $status = $row['status'];
             if (!isset($result[$pid])) {
-                $result[$pid] = array();
+                $result[$pid] = [];
             }
             $result[$pid][$user][$status] = (bool) $row['assigned'];
         }
