@@ -10,13 +10,13 @@ namespace dokuwiki\plugin\structpublish\meta;
 class Constants
 {
     // a page can be in one current status
-    const STATUS_DRAFT = 'draft';
-    const STATUS_APPROVED = 'approved';
-    const STATUS_PUBLISHED = 'published';
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_PUBLISHED = 'published';
 
     // an action transitions a page from one status to another
-    const ACTION_APPROVE = 'approve';
-    const ACTION_PUBLISH = 'publish';
+    public const ACTION_APPROVE = 'approve';
+    public const ACTION_PUBLISH = 'publish';
 
     /**
      * Convenience function mapping transition actions to resulting status

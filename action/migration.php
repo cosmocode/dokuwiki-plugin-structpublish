@@ -4,7 +4,7 @@ use dokuwiki\plugin\sqlite\Tools;
 
 class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 {
-    const MIN_DB_STRUCT = 19;
+    public const MIN_DB_STRUCT = 19;
 
     /** @var string  */
     protected $table = 'data_structpublish';
