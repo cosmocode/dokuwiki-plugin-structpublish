@@ -121,7 +121,8 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
             throw new \Exception('Auth cannot fetch users by group.');
         }
 
-        $users = $auth->retrieveUsers(0, 0, ['grps' => substr($recipient, 1)]);
+        // set arbitrary limit because not all backends interpret limit 0 as "no limit"
+        $users = $auth->retrieveUsers(0, 5000, ['grps' => substr($recipient, 1)]);
         foreach ($users as $user) {
             $resolved[] = $user['mail'];
         }
