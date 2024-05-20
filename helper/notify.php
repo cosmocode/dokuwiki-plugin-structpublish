@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\Extension\Plugin;
 use dokuwiki\Extension\AuthPlugin;
 use dokuwiki\plugin\structpublish\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Constants;
@@ -8,7 +9,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 /**
  * Notification helper
  */
-class helper_plugin_structpublish_notify extends DokuWiki_Plugin
+class helper_plugin_structpublish_notify extends Plugin
 {
     /** @var helper_plugin_structpublish_db  */
     protected $dbHelper;

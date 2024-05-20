@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\Extension\AdminPlugin;
 use dokuwiki\plugin\structpublish\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Constants;
 
@@ -9,7 +10,7 @@ use dokuwiki\plugin\structpublish\meta\Constants;
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Anna Dabrowska <dokuwiki@cosmocode.de>
  */
-class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
+class admin_plugin_structpublish extends AdminPlugin
 {
     /**
      * @return int sort number in admin menu
@@ -81,7 +82,7 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
                 }
             }
 
-            send_redirect(wl($ID, array('do' => 'admin', 'page' => 'structpublish'), true, '&'));
+            send_redirect(wl($ID, ['do' => 'admin', 'page' => 'structpublish'], true, '&'));
         }
     }
 
@@ -90,7 +91,7 @@ class admin_plugin_structpublish extends DokuWiki_Admin_Plugin
      */
     public function html()
     {
-        ptln('<h1>' . $this->getLang('menu') . '</h1>');
+        echo '<h1>' . $this->getLang('menu') . '</h1>';
 
         global $ID;
 
