@@ -115,7 +115,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 
         // add link to diff view
         if ($diff && $diff !== $rev->getRev()) {
-            $link = wl($rev->getId(), ['do' => 'diff', 'rev1' => $rev->getRev(), 'rev2' => $diff]);
+            $link = wl($rev->getId(), ['do' => 'diff', 'rev2[0]' => $rev->getRev(), 'rev2[1]' => $diff]);
             $icon = inlineSVG(__DIR__ . '/../ico/diff.svg');
             $text .= ' <a href="' . $link . '" title="' . $this->getLang('diff') . '">' . $icon . '</a>';
         }
