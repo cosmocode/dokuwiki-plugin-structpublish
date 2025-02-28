@@ -4,3 +4,5 @@ $lang['restrict_admin'] = 'Le regole di pubblicazione vengono applicate anche ag
 $lang['email_enable'] = 'Invia e-mail';
 $lang['email_status'] = 'Modifiche dello stato che attivano le notifiche via e-mail';
 $lang['compact_view'] = 'Banner compatto';
+$lang['publish_needs_approve'] = 'Le pagine devono essere approvate prima di essere pubblicate';
+

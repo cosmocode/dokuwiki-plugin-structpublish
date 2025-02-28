@@ -1,0 +1,5 @@
+Bonjour,
+
+Ceci est une notification pour vous informer que le statut de la page « @PAGE@ » a changé pour @STATUS_CURRENT@.
+
+Vous pouvez agir dessus ici : @URL@
