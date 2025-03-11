@@ -1,5 +1,0 @@
-Hello,
-
-This is to notify you that the status of the page “@PAGE@” has changed to @STATUS_CURRENT@.
-
-You may want to take action here: @URL@

@@ -16,6 +16,7 @@ $lang['actions'] = 'Actions';
 $lang['status_draft'] = 'Draft';
 $lang['status_approved'] = 'Approved';
 $lang['status_published'] = 'Published';
+$lang['status_na'] = 'N/A';
 $lang['action_approve'] = 'Approve';
 $lang['action_publish'] = 'Publish';
 

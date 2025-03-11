@@ -16,6 +16,7 @@ $lang['actions'] = 'Aktionen';
 $lang['status_draft'] = 'Entwurf';
 $lang['status_approved'] = 'Zur Freigabe bereit';
 $lang['status_published'] = 'Freigegeben';
+$lang['status_na'] = 'k.A.';
 $lang['action_approve'] = 'Zur Freigabe bereitstellen';
 $lang['action_publish'] = 'Freigeben';
 
