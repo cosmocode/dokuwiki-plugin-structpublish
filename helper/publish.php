@@ -38,6 +38,15 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
 
         $revision = new Revision($ID, $INFO['currentrev']);
 
+	//do nothing if the current revison have already been approved 
+	if ($action === Constants::ACTION_APPROVE && $revision->getLatestApprovedRevision() !== null && $revision->getRev() == $revision->getLatestApprovedRevision()->getRev()) {
+		return $revision;
+	}
+	//do nothing if the current revison have already been published 
+	if ($action === Constants::ACTION_PUBLISH && $revision->getLatestPublishedRevision() !== null && $revision->getRev() == $revision->getLatestPublishedRevision()->getRev()) {
+		return $revision;
+	}
+
         if ($action === Constants::ACTION_PUBLISH) {
             $revision->setVersion($newversion);
         }

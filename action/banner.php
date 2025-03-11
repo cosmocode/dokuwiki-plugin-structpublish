@@ -148,33 +148,51 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
      */
     protected function actionButtons($status, $newVersion)
     {
+
         global $ID;
+
+        // If the status is published, return an empty string
         if ($status === Constants::STATUS_PUBLISHED) {
             return '';
         }
 
+        // Create a new form instance
         $form = new dokuwiki\Form\Form();
 
+
         if (
-            $status !== Constants::STATUS_APPROVED &&
-            $this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
+            	$status !== Constants::STATUS_APPROVED &&
+            	$this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
         ) {
-            $form->addButton(
+            	$form->addButton(
                 'structpublish[' . Constants::ACTION_APPROVE . ']',
                 $this->getLang('action_' . Constants::ACTION_APPROVE)
-            )->attr('type', 'submit');
+            	)->attr('type', 'submit');
         }
 
-        if ($this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
-            $form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
-            $form->addButton(
-                'structpublish[' . Constants::ACTION_PUBLISH . ']',
-                $this->getLang('action_' . Constants::ACTION_PUBLISH)
-            )->attr('type', 'submit');
-        }
+       	// Add the publish button only if the status is approved and the user has access
+	if ((bool)$this->getConf('publish_needs_approve')){
+       		if ($status === Constants::STATUS_APPROVED && $this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
+           		$form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
+           		$form->addButton(
+               		'structpublish[' . Constants::ACTION_PUBLISH . ']',
+               		$this->getLang('action_' . Constants::ACTION_PUBLISH)
+           		)->attr('type', 'submit');
+       		}
+	} else {
+        	if ($this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
+            		$form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
+            		$form->addButton(
+                	'structpublish[' . Constants::ACTION_PUBLISH . ']',
+                	$this->getLang('action_' . Constants::ACTION_PUBLISH)
+            		)->attr('type', 'submit');
+        	}
 
-        return $form->toHTML();
+	}
+       // Return the HTML representation of the form
+       return $form->toHTML();
     }
+
 
     /**
      * Tries to increase a given version

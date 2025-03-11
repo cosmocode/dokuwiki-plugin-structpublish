@@ -1,0 +1,6 @@
+Hola,
+
+Te informamos que el estado de la página “@PAGE@” ha cambiado a @STATUS_CURRENT@.
+
+Puedes tomar medidas aquí: @URL@
+

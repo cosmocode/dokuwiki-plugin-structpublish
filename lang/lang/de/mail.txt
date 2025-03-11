@@ -1,0 +1,5 @@
+Hallo,
+
+Status der Seite  “@PAGE@” wurde geändert zu @STATUS_CURRENT@.
+
+Sie können hier die aktuelle Revision bearbeiten: @URL@

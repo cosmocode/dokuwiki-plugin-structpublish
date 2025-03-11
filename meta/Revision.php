@@ -295,4 +295,36 @@ class Revision
 
         return $published;
     }
+
+    /**
+     * Return "latest" approved revision of a given page.
+     * If $rev is specified, "latest" means relative to the $rev revision.
+     *
+     * @param int|null $rev
+     * @return Revision|null
+     */
+    public function getLatestApprovedRevision($rev = null)
+    {
+        $andFilters[] = 'status=' . Constants::STATUS_APPROVED;
+        if ($rev) {
+            $andFilters[] .= 'revision=' . $rev;
+        }
+        $latestApproved = $this->getCoreData($andFilters);
+
+        if (empty($latestApproved)) {
+            return null;
+        }
+
+        $approved = new Revision(
+            $this->id,
+            $latestApproved[$this->revisionCol->getColref() - 1]->getRawValue()
+        );
+
+        $approved->setStatus($latestApproved[$this->statusCol->getColref() - 1]->getRawValue());
+        $approved->setUser($latestApproved[$this->userCol->getColref() - 1]->getRawValue());
+        $approved->setDatetime($latestApproved[$this->datetimeCol->getColref() - 1]->getRawValue());
+        $approved->setVersion($latestApproved[$this->versionCol->getColref() - 1]->getRawValue());
+
+        return $approved;
+    }
 }
