@@ -12,7 +12,9 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class revision_plugin_structpublish_test extends DokuWikiTest
 {
-    /** @inheritdoc **/
+    /**
+     * @inheritdoc 
+     **/
     protected $pluginsEnabled = ['sqlite', 'struct', 'structpublish'];
 
     /**
@@ -31,7 +33,9 @@ class revision_plugin_structpublish_test extends DokuWikiTest
         $USERINFO['grps'] = ['user', 'approver', 'publisher'];
 
         // our database migrations
-        /** @var action_plugin_structpublish_migration $migration */
+        /**
+ * @var action_plugin_structpublish_migration $migration 
+*/
         $migration = plugin_load('action', 'structpublish_migration');
         $data = '';
         $migration->handleMigrations(new Doku_Event('DUMMY_EVENT', $data));

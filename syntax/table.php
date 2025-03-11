@@ -12,13 +12,17 @@ class syntax_plugin_structpublish_table extends syntax_plugin_struct_serial
 {
     protected $tableclass = AggregationTable::class;
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc 
+     */
     public function connectTo($mode)
     {
         $this->Lexer->addSpecialPattern('----+ *structpublish *-+\n.*?\n?----+', $mode, 'plugin_structpublish_table');
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc 
+     */
     protected function addTypeFilter($config)
     {
         $config['schemas'][] = ['structpublish', 'structpublish'];

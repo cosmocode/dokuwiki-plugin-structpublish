@@ -4,7 +4,9 @@ use dokuwiki\plugin\structpublish\meta\Constants;
 
 class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
 {
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'changeStatus');
@@ -13,7 +15,7 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
     /**
      * Handle the publish button and version field
      *
-     * @param Doku_Event $event
+     * @param  Doku_Event $event
      * @return void
      * @throws Exception
      */
@@ -31,13 +33,18 @@ class action_plugin_structpublish_publish extends DokuWiki_Action_Plugin
             return;
         }
 
-        if (!checkSecurityToken()) return;
+        if (!checkSecurityToken()) { return;
+        }
 
-        /** @var helper_plugin_structpublish_publish $helper */
+        /**
+ * @var helper_plugin_structpublish_publish $helper 
+*/
         $helper = plugin_load('helper', 'structpublish_publish');
         $newRevision = $helper->saveRevision(key($in), $INPUT->str('version'));
 
-        /** @var helper_plugin_structpublish_notify $notifyHelper */
+        /**
+ * @var helper_plugin_structpublish_notify $notifyHelper 
+*/
         $notifyHelper  = plugin_load('helper', 'structpublish_notify');
         $notifyHelper->sendEmails($action, $newRevision);
     }

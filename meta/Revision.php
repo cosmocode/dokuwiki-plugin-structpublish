@@ -13,7 +13,9 @@ use dokuwiki\plugin\struct\meta\Value;
  */
 class Revision
 {
-    /** @var SQLiteDB */
+    /**
+     * @var SQLiteDB 
+     */
     protected $sqlite;
 
     protected $schema;
@@ -25,7 +27,9 @@ class Revision
     protected $version;
     protected $user;
     protected $datetime;
-    /** @var bool|\dokuwiki\plugin\struct\meta\Column */
+    /**
+     * @var bool|\dokuwiki\plugin\struct\meta\Column 
+     */
     protected $statusCol;
     protected $versionCol;
     protected $userCol;
@@ -35,8 +39,8 @@ class Revision
     /**
      * Constructor
      *
-     * @param string $id page id
-     * @param int $rev revision
+     * @param string $id  page id
+     * @param int    $rev revision
      */
     public function __construct($id, $rev)
     {
@@ -52,7 +56,9 @@ class Revision
         $this->datetimeCol = $this->schema->findColumn('datetime');
         $this->revisionCol = $this->schema->findColumn('revision');
 
-        /** @var Value[] $values */
+        /**
+ * @var Value[] $values 
+*/
         $values = $this->getCoreData(['revision=' . $this->rev]);
 
         if (!empty($values)) {
@@ -210,7 +216,7 @@ class Revision
      * Update publish status in the core table
      *
      * @param string $pid
-     * @param int $rid
+     * @param int    $rid
      */
     protected function updateCoreData($pid, $rid = 0)
     {
@@ -234,7 +240,7 @@ class Revision
      *
      * @see https://www.dokuwiki.org/plugin:struct:filters
      *
-     * @param array $andFilters
+     * @param  array $andFilters
      * @return array|Value[]
      */
     public function getCoreData($andFilters = [])
@@ -268,7 +274,7 @@ class Revision
      * Return "latest" published revision of a given page.
      * If $rev is specified, "latest" means relative to the $rev revision.
      *
-     * @param int|null $rev
+     * @param  int|null $rev
      * @return Revision|null
      */
     public function getLatestPublishedRevision($rev = null)
@@ -300,7 +306,7 @@ class Revision
      * Return "latest" approved revision of a given page.
      * If $rev is specified, "latest" means relative to the $rev revision.
      *
-     * @param int|null $rev
+     * @param  int|null $rev
      * @return Revision|null
      */
     public function getLatestApprovedRevision($rev = null)

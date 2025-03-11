@@ -13,17 +13,21 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
     /**
      * Adds publish info to page revisions
      *
-     * @param Doku_Event $event
+     * @param  Doku_Event $event
      * @return void
      */
     public function handleRevisions(Doku_Event $event)
     {
         global $INFO;
 
-        /** @var dokuwiki\Form\Form $form */
+        /**
+ * @var dokuwiki\Form\Form $form 
+*/
         $form = $event->data;
 
-        /** @var helper_plugin_structpublish_db $helper */
+        /**
+ * @var helper_plugin_structpublish_db $helper 
+*/
         $helper = plugin_load('helper', 'structpublish_db');
 
         if (!$helper->isPublishable()) {
@@ -53,10 +57,9 @@ class action_plugin_structpublish_revisions extends DokuWiki_Action_Plugin
             $version = $revision->getVersion();
 
             // insert status for published revisions
-            if (
-                is_a($el, \dokuwiki\Form\HTMLElement::class) &&
-                !empty(trim($el->val())) &&
-                $status === Constants::STATUS_PUBLISHED
+            if (is_a($el, \dokuwiki\Form\HTMLElement::class) 
+                && !empty(trim($el->val())) 
+                && $status === Constants::STATUS_PUBLISHED
             ) {
                 $val = $el->val();
                 $label = '<span class="plugin-structpublish-version">' .

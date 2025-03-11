@@ -41,11 +41,11 @@ class general_plugin_structpublish_test extends DokuWikiTest
     {
         $conf_file = __DIR__ . '/../conf/default.php';
         if (file_exists($conf_file)) {
-            include($conf_file);
+            include $conf_file;
         }
         $meta_file = __DIR__ . '/../conf/metadata.php';
         if (file_exists($meta_file)) {
-            include($meta_file);
+            include $meta_file;
         }
 
         $this->assertEquals(

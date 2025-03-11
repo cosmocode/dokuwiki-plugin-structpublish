@@ -1,7 +1,6 @@
 <?php
 /**
  * french language file for structpublish plugin
- *
  */
 
 // entrée du menu pour les plugins d'administration

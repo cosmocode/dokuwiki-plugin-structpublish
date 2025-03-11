@@ -6,7 +6,9 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 {
     public const MIN_DB_STRUCT = 19;
 
-    /** @var string  */
+    /**
+     * @var string  
+     */
     protected $table = 'data_structpublish';
 
     /**
@@ -22,13 +24,15 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * so we cannot use the mechanism in sqlite init()
      * which processes updateXXXX.sql files
      *
-     * @param Doku_Event $event
+     * @param  Doku_Event $event
      * @return bool
      * @throws Exception
      */
     public function handleMigrations(Doku_Event $event)
     {
-        /** @var \helper_plugin_struct_db $helper */
+        /**
+ * @var \helper_plugin_struct_db $helper 
+*/
         $helper = plugin_load('helper', 'struct_db');
 
         // abort if struct is not installed
@@ -79,7 +83,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * Read the current versions for struct and struct publish from the database
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param  \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
      * @return array [structversion, structpublishversion]
      */
     protected function getDbVersions($sqlite)
@@ -112,7 +116,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * Database setup
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param  \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
      * @return bool
      */
     protected function migration1($sqlite)
@@ -137,7 +141,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * Reset 'latest' flag to 0 for all rows except actually latest ones
      * for each pid / status combination.
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param  \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
      * @return bool
      */
     protected function migration2($sqlite)
@@ -155,7 +159,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * Set 'latest' flag to 0 for all rows except actually latest ones
      * for each page,
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param  \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
      * @return bool
      */
     protected function migration3($sqlite)

@@ -11,9 +11,9 @@ class helper_plugin_structpublish_assignments extends DokuWiki_Plugin
     /**
      * Check if the given pattern matches the given page
      *
-     * @param string $pattern the pattern to check against
-     * @param string $page the cleaned pageid to check
-     * @param string|null $pns optimization, the colon wrapped namespace of the page, set null for automatic
+     * @param  string      $pattern the pattern to check against
+     * @param  string      $page    the cleaned pageid to check
+     * @param  string|null $pns     optimization, the colon wrapped namespace of the page, set null for automatic
      * @return bool
      * @author Andreas Gohr
      */

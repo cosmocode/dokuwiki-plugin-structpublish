@@ -1,7 +1,6 @@
 <?php
 /**
  * Archivo de idioma en español para el plugin structpublish
- *
  */
 
 // entrada del menú para plugins de administración

@@ -14,19 +14,25 @@ use dokuwiki\plugin\sqlite\SQLiteDB;
  */
 class Assignments
 {
-    /** @var SQLiteDB */
+    /**
+     * @var SQLiteDB 
+     */
     protected $sqlite;
 
-    /** @var  array All the assignments patterns */
+    /**
+     * @var array All the assignments patterns 
+     */
     protected $patterns;
 
-    /** @var Assignments */
+    /**
+     * @var Assignments 
+     */
     protected static $instance = null;
 
     /**
      * Get the singleton instance of the Assignments
      *
-     * @param bool $forcereload create a new instance to reload the assignment data
+     * @param  bool $forcereload create a new instance to reload the assignment data
      * @return Assignments
      */
     public static function getInstance($forcereload = false)
@@ -45,7 +51,9 @@ class Assignments
      */
     protected function __construct()
     {
-        /** @var \helper_plugin_structpublish_db $helper */
+        /**
+ * @var \helper_plugin_structpublish_db $helper 
+*/
         $helper = plugin_load('helper', 'struct_db');
         $this->sqlite = $helper->getDB();
 
@@ -64,9 +72,9 @@ class Assignments
     /**
      * Add a new assignment pattern to the pattern table
      *
-     * @param string $pattern
-     * @param string $user
-     * @param string $status
+     * @param  string $pattern
+     * @param  string $user
+     * @param  string $status
      * @return bool
      */
     public function addPattern($pattern, $user, $status)
@@ -80,7 +88,9 @@ class Assignments
 
         // update assignments
         // fetch known pages
-        /** @var \helper_plugin_structpublish_db $dbHelper */
+        /**
+ * @var \helper_plugin_structpublish_db $dbHelper 
+*/
         $dbHelper = plugin_load('helper', 'structpublish_db');
         $pids = $dbHelper->getPages();
 
@@ -102,9 +112,9 @@ class Assignments
     /**
      * Remove an existing assignment pattern from the pattern table
      *
-     * @param string $pattern
-     * @param string $user
-     * @param string $status
+     * @param  string $pattern
+     * @param  string $user
+     * @param  string $status
      * @return bool
      */
     public function removePattern($pattern, $user, $status)
@@ -155,7 +165,7 @@ class Assignments
      *
      * This is mostly useful for testing and not used in the interface currently
      *
-     * @param bool $full fully delete all previous assignments
+     * @param  bool $full fully delete all previous assignments
      * @return bool
      */
     public function clear($full = false)
@@ -179,9 +189,9 @@ class Assignments
     /**
      * Add page to assignments
      *
-     * @param string $page
-     * @param string $user
-     * @param string $status
+     * @param  string $page
+     * @param  string $user
+     * @param  string $status
      * @return bool
      */
     public function assignPage($page, $user = null, $status = null)
@@ -193,8 +203,8 @@ class Assignments
     /**
      * Remove page from assignments
      *
-     * @param string $page
-     * @param string $user
+     * @param  string $page
+     * @param  string $user
      * @return bool
      */
     public function deassignPage($page, $user, $status)
@@ -216,8 +226,8 @@ class Assignments
     /**
      * Returns a list of user/group string lists per status assigned to the given page
      *
-     * @param string $page
-     * @param bool $checkpatterns Should the current patterns be re-evaluated?
+     * @param  string $page
+     * @param  bool   $checkpatterns Should the current patterns be re-evaluated?
      * @return array users assigned [role => [user, ...], ...]
      */
     public function getPageAssignments($page, $checkpatterns = true)
@@ -249,7 +259,7 @@ class Assignments
     /**
      * Get the pages known to struct and their assignment state
      *
-     * @param bool $assignedonly limit results to currently assigned only
+     * @param  bool $assignedonly limit results to currently assigned only
      * @return array
      */
     public function getPages($assignedOnly = false)

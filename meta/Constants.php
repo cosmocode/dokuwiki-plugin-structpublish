@@ -21,7 +21,7 @@ class Constants
     /**
      * Convenience function mapping transition actions to resulting status
      *
-     * @param string $action
+     * @param  string $action
      * @return string
      */
     public static function transitionBy($action)

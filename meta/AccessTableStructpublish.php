@@ -17,7 +17,7 @@ class AccessTableStructpublish extends AccessTableSerial
     protected $published = 0;
 
     /**
-     * @param 0|1|bool $published
+     * @param  0|1|bool $published
      * @return void
      */
     public function setPublished($published)
@@ -25,7 +25,9 @@ class AccessTableStructpublish extends AccessTableSerial
         $this->published = (int) $published;
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     protected function getSingleSql()
     {
         $cols = array_merge($this->getSingleNoninputCols(), $this->singleCols);
@@ -37,19 +39,25 @@ class AccessTableStructpublish extends AccessTableSerial
                       VALUES ($rid," . trim(str_repeat('?,', count($vals)), ',') . ');';
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     protected function getMultiSql()
     {
         return '';
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     protected function getSingleNoninputCols()
     {
         return ['pid', 'rev', 'latest', 'published'];
     }
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     protected function getSingleNoninputValues()
     {
         return [$this->pid, AccessTable::DEFAULT_REV, AccessTable::DEFAULT_LATEST, $this->published];
@@ -57,7 +65,7 @@ class AccessTableStructpublish extends AccessTableSerial
 
     /**
      * @inheritdoc
-     * @return int|bool
+     * @return     int|bool
      */
     protected function getLastRevisionTimestamp()
     {
@@ -69,7 +77,9 @@ class AccessTableStructpublish extends AccessTableSerial
             $opts[] = $this->ts;
         }
 
-        /** @noinspection SqlResolve */
+        /**
+ * @noinspection SqlResolve 
+*/
         $sql = "SELECT rev FROM $table $where ORDER BY rev DESC LIMIT 1";
         $ret = $this->sqlite->queryValue($sql, $opts);
 
@@ -86,7 +96,9 @@ class AccessTableStructpublish extends AccessTableSerial
      */
     protected function beforeSave()
     {
-        /** @noinspection SqlResolve */
+        /**
+ * @noinspection SqlResolve 
+*/
         return $this->sqlite->query(
             "UPDATE $this->stable SET latest = 0 WHERE latest = 1 AND pid = ?",
             [$this->pid]

@@ -10,7 +10,9 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class helper_plugin_structpublish_notify extends DokuWiki_Plugin
 {
-    /** @var helper_plugin_structpublish_db  */
+    /**
+     * @var helper_plugin_structpublish_db  
+     */
     protected $dbHelper;
 
     public function __construct()
@@ -21,8 +23,8 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
     /**
      * If activated, send emails on configured status changes.
      *
-     * @param string $action
-     * @param Revision $newRevision
+     * @param  string   $action
+     * @param  Revision $newRevision
      * @return void
      * @throws Exception
      */
@@ -62,8 +64,8 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
     }
 
     /**
-     * @param string $recipients Comma separated list of emails
-     * @param string $mailText
+     * @param  string $recipients Comma separated list of emails
+     * @param  string $mailText
      * @return void
      */
     public function sendMail($recipients, $mailText)
@@ -83,7 +85,7 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
      * and returns an array of emails
      * with user groups resolved to individual users
      *
-     * @param array $recipients
+     * @param  array $recipients
      * @return array
      * @throws Exception
      */
@@ -108,14 +110,16 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
     }
 
     /**
-     * @param array $resolved
-     * @param string $recipient
+     * @param  array  $resolved
+     * @param  string $recipient
      * @return void
      * @throws Exception
      */
     protected function resolveGroup(&$resolved, $recipient)
     {
-        /** @var AuthPlugin $auth */
+        /**
+ * @var AuthPlugin $auth 
+*/
         global $auth;
         if (!$auth->canDo('getUsers')) {
             throw new \Exception('Auth cannot fetch users by group.');
@@ -129,13 +133,15 @@ class helper_plugin_structpublish_notify extends DokuWiki_Plugin
     }
 
     /**
-     * @param array $resolved
-     * @param string $recipient
+     * @param  array  $resolved
+     * @param  string $recipient
      * @return void
      */
     protected function resolveUser(&$resolved, $recipient)
     {
-        /** @var AuthPlugin $auth */
+        /**
+ * @var AuthPlugin $auth 
+*/
         global $auth;
         $user = $auth->getUserData($recipient);
         if ($user) {
