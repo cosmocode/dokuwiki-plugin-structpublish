@@ -12,7 +12,9 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class helper_plugin_structpublish_publish extends DokuWiki_Plugin
 {
-    /** @var helper_plugin_structpublish_db  */
+    /**
+     * @var helper_plugin_structpublish_db  
+     */
     protected $dbHelper;
 
     public function __construct()
@@ -23,7 +25,7 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
     /**
      * Save publish data
      *
-     * @param string $action
+     * @param  string $action
      * @return Revision
      * @throws Exception
      */
@@ -37,6 +39,15 @@ class helper_plugin_structpublish_publish extends DokuWiki_Plugin
         }
 
         $revision = new Revision($ID, $INFO['currentrev']);
+
+        //do nothing if action is approve and the current revison have already been approved 
+        if ($action === Constants::ACTION_APPROVE && $revision->getLatestApprovedRevision() !== null && $revision->getRev() == $revision->getLatestApprovedRevision()->getRev()) {
+            return $revision;
+        }
+        //do nothing if action is publish and the current revison have already been published 
+        if ($action === Constants::ACTION_PUBLISH && $revision->getLatestPublishedRevision() !== null && $revision->getRev() == $revision->getLatestPublishedRevision()->getRev()) {
+            return $revision;
+        }
 
         if ($action === Constants::ACTION_PUBLISH) {
             $revision->setVersion($newversion);
