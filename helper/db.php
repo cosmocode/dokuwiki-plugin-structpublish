@@ -15,7 +15,9 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
      */
     public function getDB()
     {
-        /** @var helper_plugin_struct_db $struct */
+        /**
+ * @var helper_plugin_struct_db $struct 
+*/
         $struct = plugin_load('helper', 'struct_db');
         if (!$struct) {
             // FIXME show message?
@@ -26,9 +28,8 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
             return null;
         }
 
-        // on init
+        // we need to access the strucpublish even if user has no role
         if (!$this->initialized) {
-            $sqlite->getPdo()->sqliteCreateFunction('IS_PUBLISHER', [$this, 'isPublisher'], -1);
             $this->initialized = true;
         }
 
@@ -77,8 +78,8 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     /**
      * Check if the current user has the given roles on the current page
      *
-     * @param string $pid The page ID to check access for
-     * @param string[] $roles Roles needed. Empty for any role
+     * @param  string   $pid   The page ID to check access for
+     * @param  string[] $roles Roles needed. Empty for any role
      * @return bool
      */
     public function checkAccess($pid, $roles = [])
@@ -91,7 +92,7 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
      *
      * Params are read via function args
      *
-     * @param ...string $pid, $userId, $groups...
+     * @param  ...string $pid, $userId, $groups...
      * @return int Return an integer instead of boolean for better sqlite compatibility
      */
     public function isPublisher()
@@ -120,10 +121,10 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
     /**
      * Check if a given user has role assignment for a given page
      *
-     * @param string $pid Page to check
-     * @param string $userId User login name, current user if empty
-     * @param string[] $grps Groups the user has, current user's groups if empty user
-     * @param string[] $roles Roles the user should have, empty for any role
+     * @param  string   $pid    Page to check
+     * @param  string   $userId User login name, current user if empty
+     * @param  string[] $grps   Groups the user has, current user's groups if empty user
+     * @param  string[] $roles  Roles the user should have, empty for any role
      * @return bool
      */
     public static function userHasRole($pid, $userId = '', $grps = [], $roles = [])

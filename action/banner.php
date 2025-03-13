@@ -74,10 +74,10 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $banner .= $this->getBannerText('previous_publish', $prevpubRevision, $shownRevision->getRev());
         }
 
-        // link to newest draft, if exists, is not shown already and user has a role
+        // link to newest draft, if exists, if not shown already, if user has ACL write
         if ($newestRevision->getRev() != $shownRevision->getRev() 
             && $newestRevision->getStatus() != Constants::STATUS_PUBLISHED 
-            && $this->dbHelper->checkAccess($ID)
+            && auth_quickaclcheck($ID) >= 2
         ) {
             $banner .= $this->getBannerText('latest_draft', $newestRevision, $shownRevision->getRev());
         }

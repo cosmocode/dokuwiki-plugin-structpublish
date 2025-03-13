@@ -10,7 +10,9 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class action_plugin_structpublish_save extends DokuWiki_Action_Plugin
 {
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('COMMON_WIKIPAGE_SAVE', 'AFTER', $this, 'handleSave');
@@ -19,12 +21,14 @@ class action_plugin_structpublish_save extends DokuWiki_Action_Plugin
     /**
      * Handle the page save event to store revision meta data
      *
-     * @param Doku_Event $event
+     * @param  Doku_Event $event
      * @return void
      */
     public function handleSave(Doku_Event $event)
     {
-        /** @var helper_plugin_structpublish_db $dbHelper */
+        /**
+ * @var helper_plugin_structpublish_db $dbHelper 
+*/
         $dbHelper = plugin_load('helper', 'structpublish_db');
 
         $id = $event->data['id'];
@@ -38,6 +42,8 @@ class action_plugin_structpublish_save extends DokuWiki_Action_Plugin
 
         $revision = new Revision($id, $event->data['newRevision']);
         $revision->setStatus(Constants::STATUS_DRAFT);
+        $revision->setUser($_SERVER['REMOTE_USER']);
+        $revision->setTimestamp(time());
 
         try {
             $revision->save();
