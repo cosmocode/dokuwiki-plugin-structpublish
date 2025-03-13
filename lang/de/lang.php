@@ -41,3 +41,6 @@ $lang['assign_status'] = 'Aktion';
 $lang['assign_add'] = 'Hinzufügen';
 $lang['assign_del'] = 'Löschen';
 
+// email
+$lang['email_subject'] = 'Veröffentlichungsstatus einer Wikiseite hat sich geändert';
+$lang['email_error_norecipients'] = 'Keine Empfänger zum Benachrichtigen gefunden!';
