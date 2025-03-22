@@ -40,6 +40,12 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
         global $INFO;
         global $REV;
 
+        //force reload of the globals. usefull when coming from bookcreator
+        $keep = $ID;
+        $ID = $event->data['id']; 
+        $INFO = pageinfo();
+        $REV = null;
+
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
         if (!$this->dbHelper->isPublishable()) {
@@ -97,9 +103,8 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
             $event->data['replace']['@PUBLISHER@'] = $shownRevision->getUser();
             $event->data['replace']['@PUBLISHDATE@'] = $shownRevision->getDateTime();
         }
-
+        $ID = $keep;
     }
-
 
     /**
      * Clean up replacements in DW2PDF content
