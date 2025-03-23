@@ -46,7 +46,6 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
         $keep = $ID;
         $ID = $event->data['id']; 
         $INFO = pageinfo();
-        $REV = null;
 
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
