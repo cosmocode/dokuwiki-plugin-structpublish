@@ -14,7 +14,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  * @VERSION@       shown version 
  * @LATESTVERSION@ latest published version
  *
- * @author  Josquin DEHAENE <josquin@moka.works>
+ * @author  Josquin Dehaene <jo@foobarjo.org>
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  */
 
@@ -67,15 +67,18 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
         $pageMeta = p_get_metadata($ID);
         $event->data['replace']['@REDACTOR@'] = $pageMeta['last_change']['user'];
 
-        // get last published version
+        // get last published version & revision
         if ($latestpubRevision != null) {
             $event->data['replace']['@LATESTVERSION@'] = $latestpubRevision->getVersion();
+            $event->data['replace']['@LATESTVERSIONREVISION@'] = $latestpubRevision->getRev();
         }else{
             $event->data['replace']['@LATESTVERSION@'] = $this->getLang("status_na");
+            $event->data['replace']['@LATESTVERSIONREVISION@'] = $this->getLang("status_na");;
         }
 
-        // get status
+        // get status and revision
         $event->data['replace']['@STATUS@'] = $this->getLang("status_" . $shownRevision->getStatus());
+        $event->data['replace']['@REVISION@'] = $shownRevision->getRev();
 
         // status draft
         if ($event->data['replace']['@STATUS@'] === $this->getLang("status_draft")) {
