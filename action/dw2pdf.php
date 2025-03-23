@@ -11,8 +11,10 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  * @APPROVALDATE@  date of approval
  * @PUBLISHER@     user that published the page
  * @PUBLISHDATE@   date of publishing
- * @VERSION@       shown version 
- * @LATESTVERSION@ latest published version
+ * @VERSION@       shown version
+ * @REVISION@      shown revision
+ * @LATESTPUBLISHEDVERSION@ latest published version
+ * @LATESTPUBLISHEDREVISION@ latest published revision
  *
  * @author  Josquin Dehaene <jo@foobarjo.org>
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
@@ -21,7 +23,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
 {
     /**
-     * @var \helper_plugin_structpublish_db 
+     * @var \helper_plugin_structpublish_db
      */
     protected $dbHelper;
 
@@ -63,17 +65,17 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
         $prevpubRevision = $shownRevision->getLatestPublishedRevision($REV ?:  $INFO['currentrev']);
         $prevapprovedRevision = $shownRevision->getLatestApprovedRevision($REV ?: $INFO['currentrev']);
 
-        //get redactor
+        // get redactor
         $pageMeta = p_get_metadata($ID);
         $event->data['replace']['@REDACTOR@'] = $pageMeta['last_change']['user'];
 
-        // get last published version & revision
+        // get lastest published version & revision
         if ($latestpubRevision != null) {
-            $event->data['replace']['@LATESTVERSION@'] = $latestpubRevision->getVersion();
-            $event->data['replace']['@LATESTVERSIONREVISION@'] = $latestpubRevision->getRev();
+            $event->data['replace']['@LATESTPUBLISHEDVERSION@'] = $latestpubRevision->getVersion();
+            $event->data['replace']['@LATESTPUBLISHEDREVISION@'] = $latestpubRevision->getRev();
         }else{
-            $event->data['replace']['@LATESTVERSION@'] = $this->getLang("status_na");
-            $event->data['replace']['@LATESTVERSIONREVISION@'] = $this->getLang("status_na");;
+            $event->data['replace']['@LATESTPUBLISHEDVERSION@'] = $this->getLang("status_na");
+            $event->data['replace']['@LATESTPUBLISHEDREVISION@'] = $this->getLang("status_na");;
         }
 
         // get status and revision
@@ -115,8 +117,8 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
     public function clean_structpublish_replacements(Doku_Event $event)
     {
         $event->data['content'] = str_replace(
-            ['@APPROVER@', '@APPROVALDATE@', '@PUBLISHER@', '@PUBLISHDATE@', '@VERSION@', '@STATUS@', '@REDACTOR@' , '@LATESTVERSION@'],
-            ['', '', '', '', '', '', '', ''],
+            ['@APPROVER@', '@APPROVALDATE@', '@LATESTPUBLISHEDREVISION@', '@REVISION@', '@PUBLISHER@', '@PUBLISHDATE@', '@VERSION@', '@STATUS@', '@REDACTOR@' , '@LATESTPUBLISHEDVERSION@'],
+            ['', '', '', '', '', '', '', '', '', ''],
             $event->data['content']
         );
     }
