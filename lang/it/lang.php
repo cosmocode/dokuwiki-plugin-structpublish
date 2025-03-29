@@ -16,6 +16,7 @@ $lang['actions'] = 'Azioni';
 $lang['status_draft'] = 'Bozza';
 $lang['status_approved'] = 'Approvata';
 $lang['status_published'] = 'Pubblicata';
+$lang['status_na'] = 'N/D';
 $lang['action_approve'] = 'Approva';
 $lang['action_publish'] = 'Pubblica';
 

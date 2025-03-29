@@ -16,6 +16,7 @@ $lang['actions'] = 'Aktionen';
 $lang['status_draft'] = 'Entwurf';
 $lang['status_approved'] = 'Zur Freigabe bereit';
 $lang['status_published'] = 'Freigegeben';
+$lang['status_na'] = 'k.A.';
 $lang['action_approve'] = 'Zur Freigabe bereitstellen';
 $lang['action_publish'] = 'Freigeben';
 
@@ -40,3 +41,6 @@ $lang['assign_status'] = 'Aktion';
 $lang['assign_add'] = 'Hinzufügen';
 $lang['assign_del'] = 'Löschen';
 
+// email
+$lang['email_subject'] = 'Veröffentlichungsstatus einer Wikiseite hat sich geändert';
+$lang['email_error_norecipients'] = 'Keine Empfänger zum Benachrichtigen gefunden!';

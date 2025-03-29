@@ -9,13 +9,19 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  */
 class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
 {
-    /** @var \helper_plugin_structpublish_db */
+    /**
+     * @var \helper_plugin_structpublish_db 
+     */
     protected $dbHelper;
 
-    /** @var bool */
+    /**
+     * @var bool 
+     */
     protected $compactView;
 
-    /** @inheritDoc */
+    /**
+     * @inheritDoc 
+     */
     public function register(Doku_Event_Handler $controller)
     {
         $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'renderBanner');
@@ -68,11 +74,10 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             $banner .= $this->getBannerText('previous_publish', $prevpubRevision, $shownRevision->getRev());
         }
 
-        // link to newest draft, if exists, is not shown already and user has a role
-        if (
-            $newestRevision->getRev() != $shownRevision->getRev() &&
-            $newestRevision->getStatus() != Constants::STATUS_PUBLISHED &&
-            $this->dbHelper->checkAccess($ID)
+        // link to newest draft, if exists, if not shown already, if user has ACL write
+        if ($newestRevision->getRev() != $shownRevision->getRev() 
+            && $newestRevision->getStatus() != Constants::STATUS_PUBLISHED 
+            && auth_quickaclcheck($ID) >= 2
         ) {
             $banner .= $this->getBannerText('latest_draft', $newestRevision, $shownRevision->getRev());
         }
@@ -92,8 +97,8 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /**
      * Fills place holder texts with data from the given Revision
      *
-     * @param string $name
-     * @param Revision $rev
+     * @param  string   $name
+     * @param  Revision $rev
      * @return string
      */
     protected function getBannerText($name, $rev, $diff = '')
@@ -128,9 +133,9 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /**
      * Create a HTML link to a specific revision
      *
-     * @param string $id page id
-     * @param int $rev revision to link to
-     * @param int $text the link text to use
+     * @param  string $id   page id
+     * @param  int    $rev  revision to link to
+     * @param  int    $text the link text to use
      * @return string
      */
     protected function makeLink($id, $rev, $text)
@@ -142,44 +147,61 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /**
      * Create the form for approval and publishing
      *
-     * @param string $status current status
-     * @param string $newVersion suggested new Version
+     * @param  string $status     current status
+     * @param  string $newVersion suggested new Version
      * @return string
      */
     protected function actionButtons($status, $newVersion)
     {
+
         global $ID;
+
+        // If the status is published, return an empty string
         if ($status === Constants::STATUS_PUBLISHED) {
             return '';
         }
 
+        // Create a new form instance
         $form = new dokuwiki\Form\Form();
 
-        if (
-            $status !== Constants::STATUS_APPROVED &&
-            $this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
+
+        if ($status !== Constants::STATUS_APPROVED 
+            && $this->dbHelper->checkAccess($ID, [Constants::ACTION_APPROVE])
         ) {
-            $form->addButton(
-                'structpublish[' . Constants::ACTION_APPROVE . ']',
-                $this->getLang('action_' . Constants::ACTION_APPROVE)
-            )->attr('type', 'submit');
+                $form->addButton(
+                    'structpublish[' . Constants::ACTION_APPROVE . ']',
+                    $this->getLang('action_' . Constants::ACTION_APPROVE)
+                )->attr('type', 'submit');
         }
 
-        if ($this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
-            $form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
-            $form->addButton(
-                'structpublish[' . Constants::ACTION_PUBLISH . ']',
-                $this->getLang('action_' . Constants::ACTION_PUBLISH)
-            )->attr('type', 'submit');
-        }
+           // Add the publish button only if the status is approved and the user has access
+        if ((bool)$this->getConf('publish_needs_approve')) {
+            if ($status === Constants::STATUS_APPROVED && $this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
+                $form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
+                $form->addButton(
+                    'structpublish[' . Constants::ACTION_PUBLISH . ']',
+                    $this->getLang('action_' . Constants::ACTION_PUBLISH)
+                )->attr('type', 'submit');
+            }
+        } else {
+            if ($this->dbHelper->checkAccess($ID, [Constants::ACTION_PUBLISH])) {
+                $form->addTextInput('version', $this->getLang('newversion'))->val($newVersion);
+                $form->addButton(
+                    'structpublish[' . Constants::ACTION_PUBLISH . ']',
+                    $this->getLang('action_' . Constants::ACTION_PUBLISH)
+                )->attr('type', 'submit');
+            }
 
+        }
+        // Return the HTML representation of the form
         return $form->toHTML();
     }
+
 
     /**
      * Tries to increase a given version
      *
-     * @param string $version
+     * @param  string $version
      * @return string
      */
     protected function increaseVersion($version)
