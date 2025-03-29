@@ -6,14 +6,14 @@ use dokuwiki\plugin\structpublish\meta\Revision;
 /**
  * Action component providing (localized) dw2pdf replacements
  *
- * @STATUS@        draft / approved / published
- * @APPROVER@      user that approved the draft
- * @APPROVALDATE@  date of approval
- * @PUBLISHER@     user that published the page
- * @PUBLISHDATE@   date of publishing
- * @VERSION@       shown version
- * @REVISION@      shown revision
- * @LATESTPUBLISHEDVERSION@ latest published version
+ * @STATUS@                  draft / approved / published
+ * @APPROVER@                user that approved the draft
+ * @APPROVALDATE@            date of approval
+ * @PUBLISHER@               user that published the page
+ * @PUBLISHDATE@             date of publishing
+ * @VERSION@                 shown version
+ * @REVISION@                shown revision
+ * @LATESTPUBLISHEDVERSION@  latest published version
  * @LATESTPUBLISHEDREVISION@ latest published revision
  *
  * @author  Josquin Dehaene <jo@foobarjo.org>
@@ -46,6 +46,7 @@ class action_plugin_structpublish_dw2pdf extends DokuWiki_Action_Plugin
         $keep = $ID;
         $ID = $event->data['id']; 
         $INFO = pageinfo();
+        $REV = $event->data['rev'];
 
         $this->dbHelper = plugin_load('helper', 'structpublish_db');
 
