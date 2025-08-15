@@ -257,7 +257,7 @@ class Revision
         // disable 'latest' flag in select query
         $search->setSelectLatest(false);
 
-        $data = $search->execute();
+        $data = $search->getRows();
         if (!empty($data)) {
             return array_pop($data);
         }
