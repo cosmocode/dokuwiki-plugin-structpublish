@@ -2,6 +2,7 @@
 
 namespace dokuwiki\plugin\structpublish\meta;
 
+use dokuwiki\plugin\struct\meta\Column;
 use dokuwiki\plugin\sqlite\SQLiteDB;
 use dokuwiki\plugin\struct\meta\ConfigParser;
 use dokuwiki\plugin\struct\meta\Schema;
@@ -20,12 +21,12 @@ class Revision
 
     protected $id;
     protected $rev;
-    protected $published;
-    protected $status;
+    protected $published = 0;
+    protected $status = Constants::STATUS_DRAFT;
     protected $version;
     protected $user;
     protected $datetime;
-    /** @var bool|\dokuwiki\plugin\struct\meta\Column */
+    /** @var bool|Column */
     protected $statusCol;
     protected $versionCol;
     protected $userCol;
@@ -42,8 +43,6 @@ class Revision
     {
         $this->id = $id;
         $this->rev = $rev;
-        $this->published = 0;
-        $this->status = Constants::STATUS_DRAFT;
 
         $this->schema = new Schema('structpublish');
         $this->statusCol = $this->schema->findColumn('status');
@@ -53,7 +52,7 @@ class Revision
         $this->revisionCol = $this->schema->findColumn('revision');
 
         /** @var Value[] $values */
-        $values = $this->getCoreData(['revision=' . $this->rev]);
+        $this->getCoreData(['revision=' . $this->rev]);
 
         if (!empty($values)) {
             $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
@@ -257,6 +256,7 @@ class Revision
         $search = new SearchConfig($config);
         // disable 'latest' flag in select query
         $search->setSelectLatest(false);
+
         $data = $search->execute();
         if (!empty($data)) {
             return array_pop($data);

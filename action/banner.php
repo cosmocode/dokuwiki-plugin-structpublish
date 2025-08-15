@@ -1,5 +1,9 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
+use dokuwiki\Form\Form;
 use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
 
@@ -7,7 +11,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  * Action component responsible for the publish banner
  * attached to struct data of a page
  */
-class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_banner extends ActionPlugin
 {
     /** @var \helper_plugin_structpublish_db */
     protected $dbHelper;
@@ -16,7 +20,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     protected $compactView;
 
     /** @inheritDoc */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('TPL_ACT_RENDER', 'BEFORE', $this, 'renderBanner');
     }
@@ -24,7 +28,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
     /**
      * Add banner to pages under structpublish control
      */
-    public function renderBanner(Doku_Event $event)
+    public function renderBanner(Event $event)
     {
         global $ID;
         global $INFO;
@@ -153,7 +157,7 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
             return '';
         }
 
-        $form = new dokuwiki\Form\Form();
+        $form = new Form();
 
         if (
             $status !== Constants::STATUS_APPROVED &&
@@ -192,6 +196,6 @@ class action_plugin_structpublish_banner extends DokuWiki_Action_Plugin
         }
         $parts[] = $last;
 
-        return join('.', $parts);
+        return implode('.', $parts);
     }
 }
