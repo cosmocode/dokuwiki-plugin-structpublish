@@ -44,7 +44,7 @@ class action_plugin_structpublish_show extends DokuWiki_Action_Plugin
         $currentRevision = new Revision($ID, $REV ?: $INFO['currentrev']);
         $isPublished = $currentRevision->getStatus() === Constants::STATUS_PUBLISHED;
 
-        if (!$dbHelper->isPublisher($ID)) {
+        if (!$dbHelper->isPublisher($ID) && auth_quickaclcheck($ID) < AUTH_EDIT) {
             $latestPublished = $currentRevision->getLatestPublishedRevision();
             // there is no published revision, show nothing
             if (!$isPublished && is_null($latestPublished)) {
