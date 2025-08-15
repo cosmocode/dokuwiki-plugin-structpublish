@@ -1,8 +1,10 @@
 <?php
 
+use dokuwiki\Extension\Plugin;
+use dokuwiki\plugin\sqlite\SQLiteDB;
 use dokuwiki\plugin\structpublish\meta\Assignments;
 
-class helper_plugin_structpublish_db extends DokuWiki_Plugin
+class helper_plugin_structpublish_db extends Plugin
 {
     protected $initialized = false;
 
@@ -11,7 +13,7 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
      *
      * Registers our own IS_PUBLISHER function with sqlite
      *
-     * @return \dokuwiki\plugin\sqlite\SQLiteDB|null
+     * @return SQLiteDB|null
      */
     public function getDB()
     {
@@ -94,13 +96,11 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
      * @param ...string $pid, $userId, $groups...
      * @return int Return an integer instead of boolean for better sqlite compatibility
      */
-    public function isPublisher()
+    public function isPublisher(...$args)
     {
 
         global $USERINFO;
         global $INPUT;
-
-        $args = func_get_args();
         $pid = $args[0];
 
         if (!$pid || !$this->isPublishable($pid)) {
@@ -110,11 +110,7 @@ class helper_plugin_structpublish_db extends DokuWiki_Plugin
         $userId = $args[1] ?? $INPUT->server->str('REMOTE_USER');
         $grps = $args[2] ?? ($USERINFO['grps'] ?? []);
 
-        return (int)$this->userHasRole(
-            $pid,
-            $userId,
-            $grps
-        );
+        return (int)static::userHasRole($pid, $userId, $grps);
     }
 
     /**

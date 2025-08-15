@@ -1,8 +1,13 @@
 <?php
 
+use dokuwiki\Extension\ActionPlugin;
+use dokuwiki\Extension\EventHandler;
+use dokuwiki\Extension\Event;
+use dokuwiki\plugin\struct\meta\SchemaImporter;
+use dokuwiki\plugin\sqlite\SQLiteDB;
 use dokuwiki\plugin\sqlite\Tools;
 
-class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
+class action_plugin_structpublish_migration extends ActionPlugin
 {
     public const MIN_DB_STRUCT = 19;
 
@@ -12,7 +17,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * @inheritDoc
      */
-    public function register(Doku_Event_Handler $controller)
+    public function register(EventHandler $controller)
     {
         $controller->register_hook('ACTION_ACT_PREPROCESS', 'BEFORE', $this, 'handleMigrations');
     }
@@ -22,11 +27,11 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * so we cannot use the mechanism in sqlite init()
      * which processes updateXXXX.sql files
      *
-     * @param Doku_Event $event
+     * @param Event $event
      * @return bool
      * @throws Exception
      */
-    public function handleMigrations(Doku_Event $event)
+    public function handleMigrations(Event $event)
     {
         /** @var \helper_plugin_struct_db $helper */
         $helper = plugin_load('helper', 'struct_db');
@@ -38,7 +43,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         $sqlite = $helper->getDB();
 
-        list($dbVersionStruct, $dbVersionStructpublish) = $this->getDbVersions($sqlite);
+        [$dbVersionStruct, $dbVersionStructpublish] = $this->getDbVersions($sqlite);
 
         // check if struct has required version
         if ($dbVersionStruct < self::MIN_DB_STRUCT) {
@@ -55,7 +60,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
 
         // check whether we have any pending migrations
         $pending = range(($dbVersionStructpublish ?: 0) + 1, $latestVersion);
-        if (empty($pending)) {
+        if ($pending === []) {
             return true;
         }
 
@@ -79,7 +84,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * Read the current versions for struct and struct publish from the database
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param SQLiteDB $sqlite
      * @return array [structversion, structpublishversion]
      */
     protected function getDbVersions($sqlite)
@@ -112,14 +117,14 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
     /**
      * Database setup
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param SQLiteDB $sqlite
      * @return bool
      */
     protected function migration1($sqlite)
     {
         $file = DOKU_PLUGIN . 'structpublish/db/json/structpublish0001.struct.json';
         $schemaJson = file_get_contents($file);
-        $importer = new \dokuwiki\plugin\struct\meta\SchemaImporter('structpublish', $schemaJson);
+        $importer = new SchemaImporter('structpublish', $schemaJson);
         $ok = (bool) $importer->build();
 
         if ($ok) {
@@ -137,7 +142,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * Reset 'latest' flag to 0 for all rows except actually latest ones
      * for each pid / status combination.
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param SQLiteDB $sqlite
      * @return bool
      */
     protected function migration2($sqlite)
@@ -155,7 +160,7 @@ class action_plugin_structpublish_migration extends DokuWiki_Action_Plugin
      * Set 'latest' flag to 0 for all rows except actually latest ones
      * for each page,
      *
-     * @param \dokuwiki\plugin\sqlite\SQLiteDB $sqlite
+     * @param SQLiteDB $sqlite
      * @return bool
      */
     protected function migration3($sqlite)

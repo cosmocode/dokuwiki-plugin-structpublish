@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\Extension\Plugin;
 use dokuwiki\plugin\struct\meta\Assignments;
 use dokuwiki\plugin\structpublish\meta\Constants;
 use dokuwiki\plugin\structpublish\meta\Revision;
@@ -10,7 +11,7 @@ use dokuwiki\plugin\structpublish\meta\Revision;
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Anna Dabrowska <dokuwiki@cosmocode.de>
  */
-class helper_plugin_structpublish_publish extends DokuWiki_Plugin
+class helper_plugin_structpublish_publish extends Plugin
 {
     /** @var helper_plugin_structpublish_db  */
     protected $dbHelper;

@@ -1,12 +1,14 @@
 <?php
 
+use dokuwiki\Extension\Plugin;
+
 /**
  * DokuWiki Plugin structpublish (Helper Component)
  *
  * @license GPL 2 http://www.gnu.org/licenses/gpl-2.0.html
  * @author  Anna Dabrowska <dokuwiki@cosmocode.de>
  */
-class helper_plugin_structpublish_assignments extends DokuWiki_Plugin
+class helper_plugin_structpublish_assignments extends Plugin
 {
     /**
      * Check if the given pattern matches the given page
@@ -43,11 +45,9 @@ class helper_plugin_structpublish_assignments extends DokuWiki_Plugin
             if ($ans == $pns) {
                 return true;
             }
-        } else {
+        } elseif (cleanID($pattern) == $page) {
             // exact match
-            if (cleanID($pattern) == $page) {
-                return true;
-            }
+            return true;
         }
 
         return false;

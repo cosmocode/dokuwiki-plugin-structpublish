@@ -1,5 +1,6 @@
 <?php
 
+use dokuwiki\plugin\struct\meta\AccessTablePage;
 use dokuwiki\plugin\struct\meta\AggregationTable;
 
 /**
@@ -26,7 +27,7 @@ class syntax_plugin_structpublish_table extends syntax_plugin_struct_serial
         $config['filter'][] = [
             '%rowid%',
             '!=',
-            (string) \dokuwiki\plugin\struct\meta\AccessTablePage::DEFAULT_PAGE_RID,
+            (string) AccessTablePage::DEFAULT_PAGE_RID,
             'AND'
         ];
         $config['withpid'] = 1; // flag for the editor to distinguish data types
