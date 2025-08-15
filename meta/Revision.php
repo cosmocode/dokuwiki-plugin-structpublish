@@ -52,7 +52,7 @@ class Revision
         $this->revisionCol = $this->schema->findColumn('revision');
 
         /** @var Value[] $values */
-        $this->getCoreData(['revision=' . $this->rev]);
+        $values = $this->getCoreData(['revision=' . $this->rev]);
 
         if (!empty($values)) {
             $this->status = $values[$this->statusCol->getColref() - 1]->getRawValue();
